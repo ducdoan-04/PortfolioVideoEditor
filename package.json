@@ -6,7 +6,13 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "dev:full": "powershell -ExecutionPolicy Bypass -File start-all.ps1",
+    "dev:npm": "npm run dev",
+    "install:npm": "npm install",
+    "fix:start": "start-frontend.bat",
+    "test:api": "powershell -ExecutionPolicy Bypass -File test-api.ps1",
+    "setup": "npm install && cd backend-new && npm install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",

@@ -1,316 +1,24 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X } from "lucide-react"
-// 
-// const portfolioCategories = [
-//   { id: "my-fav", name: "My Fav <3", active: true },
-//   { id: "travel", name: "Travel", active: false },
-//   { id: "trailer", name: "Trailer", active: false },
-//   { id: "MV", name: "Real Estate", active: false },
-//   { id: "wedding", name: "Underwater", active: false },
-//   { id: "brand", name: "Brand", active: false },
-//   { id: "shorts", name: "Shorts", active: false },
-// ]
-const portfolioCategories = [
-  { id: "my-fav", name: "My Fav <3", active: true },
-  { id: "travel", name: "Travel", active: false },
-  { id: "tutorial", name: "Tutorial", active: false },
-  { id: "real-estate", name: "Trailer", active: false },
-  { id: "underwater", name: "Wedding", active: false },
-  { id: "brand", name: "Brand", active: false },
-  { id: "shorts", name: "Shorts", active: false },
-]
-
-const portfolioData = {
-  "my-fav": [
-    {
-      title: "CORPORATE HOUSING",
-      subtitle: "Business Promo",
-      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Corporate+Housing",
-      duration: "2:15",
-      videoId: "dQw4w9WgXcQ", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Digital Nomad 2023",
-      subtitle: "Lifestyle Brand",
-      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Digital+Nomad",
-      duration: "4:45",
-      videoId: "jNQXAC9IVRw", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "HOC LAN DAO PHU QUY",
-      subtitle: "Freelancing Dao Phu Quy",
-      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Hoc+Lan+Dao+Phu+Quy",
-      duration: "5:20",
-      videoId: "9bZkp7q19f0", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "VIDEO EDITOR",
-      subtitle: "Promotional Video",
-      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Video+Editor+Promo",
-      duration: "3:30",
-      videoId: "ScMzIvxBSi4", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-      },
-  ],
-  travel: [
-    {
-      title: "TAJIKISTAN HISOR",
-      subtitle: "Travel Vlog",
-      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Tajikistan+Travel",
-      duration: "8:45",
-      videoId: "ZXsQAXx_ao0", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "SAM MAY BA LAT",
-      subtitle: "Travel Adventure",
-      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Sam+May+Ba+Lat",
-      duration: "6:30",
-      videoId: "kJQP7kiw5Fk", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "XUYEN VIET",
-      subtitle: "Vietnam Journey",
-      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Xuyen+Viet",
-      duration: "12:15",
-      videoId: "L_jWHffIx5E", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "AM THANH BA LAT",
-      subtitle: "Sound of Ba Lat",
-      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Am+Thanh+Ba+Lat",
-      duration: "4:20",
-      videoId: "fJ9rUzIMcZQ", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "PHUOT VIET NAM",
-      subtitle: "Vietnam Adventure",
-      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Phuot+Viet+Nam",
-      duration: "10:30",
-      videoId: "Ks-_Mh1QhMc", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "DA LAT JOURNEY",
-      subtitle: "Highland Adventure",
-      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Da+Lat+Journey",
-      duration: "7:15",
-      videoId: "hTWKbfoikeg", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-  tutorial: [
-    {
-      title: "HIEU BO SUA VIDEO",
-      subtitle: "Video Editing Tutorial",
-      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Video+Tutorial",
-      duration: "15:30",
-      videoId: "YQHsXMglC9A", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Nghien Cuu Thi Khoa Youtube",
-      subtitle: "YouTube Research",
-      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=YouTube+Research",
-      duration: "22:45",
-      videoId: "oHg5SJYRHA0", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Tap Khoa Youtube Chuan SEO",
-      subtitle: "YouTube SEO Course",
-      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=YouTube+SEO",
-      duration: "18:20",
-      videoId: "RBumgq5yVrA", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "After Effects Basics",
-      subtitle: "Motion Graphics Tutorial",
-      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=After+Effects",
-      duration: "25:10",
-      videoId: "lTRiuFIWV54", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-  "real-estate": [
-    {
-      title: "An Gia Homestay",
-      subtitle: "Property Tour",
-      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=An+Gia+Homestay",
-      duration: "3:45",
-      videoId: "M7lc1UVf-VE", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-      },
-    {
-      title: "Dalant Villa",
-      subtitle: "Luxury Property",
-      thumbnail: "/backgroundVideo/4.jpgheight=200&width=300&text=Dalant+Villa",
-      duration: "4:20",
-      videoId: "QH2-TGUlwu4", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Moonlight House",
-      subtitle: "Night Property",
-      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Moonlight+House",
-      duration: "2:55",
-      videoId: "nOHFR1xi2f8", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-  underwater: [
-    {
-      title: "Floating Freelancing",
-      subtitle: "Underwater Scene",
-      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Floating+Freelancing",
-      duration: "2:30",
-      videoId: "SX_ViT4Ra7k", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Hair Freelancing",
-      subtitle: "Underwater Scene",
-      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Hair+Freelancing",
-      duration: "1:45",
-      videoId: "iik25wqIuFo", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Heart Freelancing",
-      subtitle: "Underwater Scene",
-      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Heart+Freelancing",
-      duration: "3:15",
-      videoId: "BaW_jenozKc", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-  brand: [
-    {
-      title: "PHUOT VAN BIEN DT 201",
-      subtitle: "Brand Campaign",
-      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Phuot+Van+Bien",
-      duration: "3:30",
-      videoId: "kffacxfA7G4", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "CORPORATE HOUSING",
-      subtitle: "Business Promo",
-      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Corporate+Brand",
-      duration: "2:15",
-      videoId: "dQw4w9WgXcQ", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-  shorts: [
-    {
-      title: "Quick Edit Tips",
-      subtitle: "Short Tutorial",
-      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Quick+Tips",
-      duration: "0:45",
-      videoId: "jfKfPfyJRdk", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Color Grading Fast",
-      subtitle: "Quick Guide",
-      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Color+Grading",
-      duration: "0:30",
-      videoId: "ixmxOlcrlUc", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Transition Effects",
-      subtitle: "Quick Tutorial",
-      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Transitions",
-      duration: "0:55",
-      videoId: "hFZFjoX2cGg", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-    {
-      title: "Audio Sync Tips",
-      subtitle: "Quick Guide",
-      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Audio+Sync",
-      duration: "0:40",
-      videoId: "09R8_2nJtjg", // Example YouTube video ID
-      Software: "Capcut Pc, Premiere Pro, After Effects",
-      description: "This is a description of the project",
-    },
-  ],
-}
-
-const recentProjects = [
-  {
-    title: "Freelancing Dao Phu Quy",
-    date: "November 30, 2023",
-    thumbnail: "/backgroundVideo/3.jpg?height=150&width=200&text=Recent+Project+1",
-    views: "2.5K",
-    videoId: "QjR3DDjnijM", // Example YouTube video ID
-    Software: "Capcut Pc, Premiere Pro, After Effects",
-    description: "This is a description of the project",
-  },
-  {
-    title: "Nghien Cuu Thi Khoa Youtube",
-    date: "March 15, 2024",
-    thumbnail: "/backgroundVideo/4.jpg?height=150&width=200&text=Recent+Project+2",
-    views: "15K",
-    videoId: "oHg5SJYRHA0", // Example YouTube video ID
-    Software: "Capcut Pc, Premiere Pro, After Effects",
-    description: "This is a description of the project",
-  },
-]
 
 // Video Modal Component
-function VideoModal({ isOpen, onClose, videoId, title, Software, description }) {
+function VideoModal({ isOpen, onClose, videoId, title, software, description }) {
   if (!isOpen || !videoId) return null
 
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      
       <DialogContent className="max-w-4xl w-full p-0 bg-white flex flex-col md:flex-col">
-         {/* Video bên trái */}
-         <div className="relative md:w-3/3 w-full" style={{ paddingBottom: "56.25%" }}>
+        {/* Video bên trái */}
+        <div className="relative md:w-3/3 w-full" style={{ paddingBottom: "56.25%" }}>
           <iframe
             src={embedUrl}
             title={title}
@@ -321,22 +29,20 @@ function VideoModal({ isOpen, onClose, videoId, title, Software, description }) 
           />
         </div>
         {/* Mô tả bên phải */}
-        <div className="md:w-3/3 w-full text-white flex flex-col ">
+        <div className="md:w-3/3 w-full text-white flex flex-col">
           <DialogHeader className="pr-1 pl-4 pt-0 pb-0">
             <div className="flex justify-between items-center">
               <DialogTitle className="text-black text-2xl">{title}</DialogTitle>
-              <Button variant="ghost" size="sm" onClick={onClose} className="text-black bg-red-200 hover:bg-red-500 rounded-sm" >
+              <Button variant="ghost" size="sm" onClick={onClose} className="text-black bg-red-200 hover:bg-red-500 rounded-sm">
                 <X className="w-2 h-2" />
               </Button>
             </div>
           </DialogHeader>
-          <div className="block  text-sm text-gray-600 mb-4 ml-4">
-            <p className="pt-2"><a style={{textDecoration: "none", color: "black"}}>Tools:</a> {Software}</p>
-            <p className="pt-2"><a style={{textDecoration: "none", color: "black"}}>Description:</a> {description}</p>
+          <div className="block text-sm text-gray-600 mb-4 ml-4">
+            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>Tools:</a> {software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>Description:</a> {description || "No description available"}</p>
           </div>
         </div>
-
-
       </DialogContent>
     </Dialog>
   )
@@ -344,39 +50,97 @@ function VideoModal({ isOpen, onClose, videoId, title, Software, description }) 
 
 export default function VideoEditorPortfolio() {
   const [activeCategory, setActiveCategory] = useState("my-fav")
-  const [currentData, setCurrentData] = useState(portfolioData["my-fav"])
+  const [currentData, setCurrentData] = useState([])
+  const [categories, setCategories] = useState([])
+  const [recentProjects, setRecentProjects] = useState([])
+  const [loading, setLoading] = useState(true)
   const [videoModal, setVideoModal] = useState({
     isOpen: false,
     videoId: null,
     title: "",
-    Software: "",
+    software: "",
     description: "",
   })
 
-  const handleCategoryChange = (categoryId) => {
-    setActiveCategory(categoryId)
-    setCurrentData(portfolioData[categoryId] || [])
-  }
+  // Fetch data from backend
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const categoriesResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
+          const categoriesData = await categoriesResp.json();
+          if (categoriesData.success) {
+            const mappedCategories = categoriesData.data.map(cat => ({
+              id: cat.id,
+              name: cat.name, // Sử dụng cat.name
+              description: cat.description,
+              color: cat.color,
+              created_at: cat.created_at,
+              active: cat.id === 1, // Mặc định active là category có id = 1
+            }));
+            setCategories(mappedCategories);
+          }
 
-  const openVideoModal = (videoId, title, Software, description) => {
-    setVideoModal({
-      isOpen: true,
-      videoId: videoId,
-      title: title,
-      Software: Software,
-      description: description,
-    })
+          const videosResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos?category=${categories.find(cat => cat.id === 1)?.name || 'my-fav'}`);
+          const videosData = await videosResp.json();
+          if (videosData.success) {
+            setCurrentData(videosData.data.videos.map(video => ({
+              ...video,
+              thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
+              duration: video.duration || "N/A",
+            })));
+          }
+
+          const recentResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/recent?limit=2`);
+          const recentData = await recentResp.json();
+          if (recentData.success) {
+            setRecentProjects(recentData.data.map(video => ({
+              ...video,
+              thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
+              views: video.views ? `${video.views}K` : "N/A",
+              date: video.created_at ? new Date(video.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
+            })));
+          }
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }, []);
+
+  // Handle category change
+  const handleCategoryChange = async (categoryId) => {
+    setActiveCategory(categoryId);
+    setLoading(true);
+    try {
+      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos?category=${categories.find(cat => cat.id === categoryId)?.name}`);
+      const data = await resp.json();
+      if (data.success) {
+        setCurrentData(data.data.videos.map(video => ({
+          ...video,
+          thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
+          duration: video.duration || "N/A",
+        })));
+      }
+    } catch (error) {
+      console.error("Error fetching category data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+
+  const openVideoModal = (videoId, title, software, description) => {
+    setVideoModal({ isOpen: true, videoId, title, software, description })
   }
 
   const closeVideoModal = () => {
-    setVideoModal({
-      isOpen: false,
-      videoId: null,
-      title: "",
-      Software: "",
-      description: "",
-    })
+    setVideoModal({ isOpen: false, videoId: null, title: "", software: "", description: "" })
   }
+
+  if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">Loading...</div>
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -391,51 +155,33 @@ export default function VideoEditorPortfolio() {
       </div>
 
       {/* Main Container */}
-      <div className="max-w-6xl mx-auto bg-white pt-8 ">
+      <div className="max-w-6xl mx-auto bg-white pt-8">
         {/* Header Section */}
         <div className="relative px-8 pt-12 pb-8 flex justify-center">
-          {/* Main Content Layout */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-12 md:gap-16">
             {/* Left Side - Profile Image and Socials */}
             <div className="relative flex flex-col items-center">
-              {/* Phone Number - Top Left */}
-              <a href="tel:+84919261712" className="absolute -top-0 -left-9 flex items-center gap-2 z-20">
-                <div className="w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Phone className="w-4 h-4 text-white" />
+              <a href="tel:+84919261712" className="absolute -top-0 md:mt-6 -left-0 flex items-center gap-2 z-20">
+                <div className="w-11 h-11 bg-white shadow-md rounded-xl flex items-center justify-center">
+                  <Phone className="w-6 h-6 text-blue-500" />
                 </div>
-                <span className="text-gray-600 text-sm font-medium">+84919261712</span>
+                <span className="text-gray-600 text-sm font-medium" style={{ display: "none" }}>+84919261712</span>
               </a>
-              {/* Gmail Icon - Top Right of Content */}
-              <a href="mailto:ho.duc.doan@gmail.com" className="absolute -top-0 right-0 md:mb-4 flex justify-end md:justify-start z-20">
+              <a href="mailto:ho.duc.doan@gmail.com" className="absolute -top-0 md:mt-5 right-0 md:mb-4 flex justify-end md:justify-start z-20">
                 <div className="w-12 h-12 bg-white shadow-md rounded-xl flex items-center justify-center">
                   <Mail className="w-7 h-7 text-red-500" />
                 </div>
               </a>
 
-              {/* Decorative circles around profile */}
-              <div className="absolute -inset-12 pointer-events-none" >
+              <div className="absolute -inset-12 pointer-events-none">
                 <div className="w-80 h-80 border-2 border-blue-500 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="w-60 h-60 border   border-blue-200 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
-                {/* Top right blue dots */}
-                <div className="absolute -top-6 right-0 grid grid-cols-4 gap-1" style={{ display: "none" }}>
-                  {[...Array(12)].map((_, i) => (
-                    <div key={i} className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                  ))}
-                </div>
-                {/* Bottom left blue dots */}
-                <div className="absolute bottom-0 -left-6 grid grid-cols-3 gap-1" style={{ display: "none" }}>
-                  {[...Array(9)].map((_, i) => (
-                    <div key={i} className="w-2 h-2 bg-blue-200 rounded-full"></div>
-                  ))}
-                </div>
+                <div className="w-60 h-60 border border-blue-200 rounded-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
               </div>
 
-              {/* Profile Image with Blue Border */}
               <div className="relative z-10">
-                <div className="w-64 h-64 ">
-                  <div className="rounded-full bg-blue-500 mt-2">
-                  </div>
-                  <div className="w-60 h-61  overflow-hidden pb-2 mt-2">
+                <div className="w-64 h-64">
+                  <div className="rounded-full bg-blue-500 mt-2"></div>
+                  <div className="w-60 h-61 overflow-hidden pb-2 mt-2">
                     <Image
                       src="/images/profile-photo.png"
                       alt="Ho Duc Doan"
@@ -446,9 +192,7 @@ export default function VideoEditorPortfolio() {
                   </div>
                 </div>
               </div>
-              
 
-              {/* Social Media Icons */}
               <div className="mt-8 z-10">
                 <div className="bg-white rounded-2xl px-8 py-4 shadow-lg flex gap-6 items-center">
                   <a href="https://www.facebook.com/doan.12.02.04" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" aria-label="Facebook">
@@ -457,7 +201,7 @@ export default function VideoEditorPortfolio() {
                   <a href="https://www.instagram.com/ducdoan.04/" className="w-12 h-12 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" aria-label="Instagram">
                     <Instagram className="w-6 h-6 text-white" />
                   </a>
-                  <a href="#" className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-colors" aria-label="YouTube">
+                  <a href="https://id.zalo.me/0919261712" className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center hover:bg-red-700 transition-colors" aria-label="YouTube">
                     <Youtube className="w-6 h-6 text-white" />
                   </a>
                 </div>
@@ -466,17 +210,13 @@ export default function VideoEditorPortfolio() {
 
             {/* Right Side - Content */}
             <div className="flex-1 w-full md:w-auto pt-8 md:pt-4 relative">
-
-
               <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-8 md:mt-0">HO DUC DOAN</h1>
               <p className="text-gray-500 font-medium text-lg mb-2">Hi there!</p>
-
               <p className="text-gray-600 leading-relaxed mb-6 max-w-lg">
                 I’m Doan a passionate video editor with 4 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
               </p>
 
-              {/* Skills List */}
-              <div className="space-y-3 mb-8 ">
+              <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
@@ -493,18 +233,18 @@ export default function VideoEditorPortfolio() {
                 </div>
               </div>
 
-              {/* Contact Button */}
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium text-base">
-                Contact me now
+              <a href="mailto:ducdoan04.work@gmail.com" className="mb-4">
+                <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium text-base">
+                 Contact me now
               </Button>
+              </a>
             </div>
           </div>
         </div>
 
         {/* Statistics Section */}
-        <div className="px-8 py-16 bg-white " >
-          <div className="flex justify-center gap-20  ">
-            {/* Work Experience */}
+        <div className="px-8 py-16 bg-white">
+          <div className="flex justify-center gap-20">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
                 <Rocket className="w-8 h-8 text-white" />
@@ -514,8 +254,6 @@ export default function VideoEditorPortfolio() {
                 <div className="text-gray-600 text-sm">Work Experience</div>
               </div>
             </div>
-
-            {/* Employers Satisfaction */}
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-8 h-8 text-white" />
@@ -525,8 +263,6 @@ export default function VideoEditorPortfolio() {
                 <div className="text-gray-600 text-sm">Employers Satisfaction</div>
               </div>
             </div>
-
-            {/* IELTS */}
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center">
                 <Building className="w-8 h-8 text-white" />
@@ -540,13 +276,13 @@ export default function VideoEditorPortfolio() {
         </div>
 
         {/* Portfolio Section */}
-        <div className="px-8 py-12 text-center">
+        <div className=" pt-4 pb-1 px-8 py-12 text-center">
           <h2 className="text-3xl font-bold text-black mb-4">My Portfolio</h2>
           <p className="text-gray-600 mb-12">Have a look on my products, I'm sure you will love it.</p>
 
           {/* Category Navigation */}
           <div className="flex justify-center gap-4 flex-wrap mb-12">
-            {portfolioCategories.map((category) => (
+            {categories.map((category) => (
               <Button
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "ghost"}
@@ -568,31 +304,31 @@ export default function VideoEditorPortfolio() {
               <Card
                 key={index}
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                onClick={() => openVideoModal(item.videoId, item.title, item.Software, item.description)}
-             >
+                onClick={() => openVideoModal(item.video_id, item.title, item.software, item.description)}
+              >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
-                      src={item.thumbnail || "/backgroundVideo/1.jpg"}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${item.thumbnail_url}` || "/uploads/backgroundVideo/1.jpg"}
                       alt={item.title}
                       width={300}
                       height={200}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                      onError={(e) => console.log("Image failed to load:", e.target.src)}
+                   />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {/* <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm"> */}
                       <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
                         <Play className="w-8 h-8 text-white ml-1" />
                       </div>
                     </div>
                     <Badge className="absolute top-3 right-3 bg-black bg-opacity-80 text-white text-xs px-2 py-1">
-                      {item.duration}
+                      {item.duration || "N/A"}
                     </Badge>
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-gray-900 mb-2 text-lg">{item.title}</h3>
-                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Tools:</a> {item.Software}</p>
-                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Description:</a> {item.description}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {item.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Description:</a> {item.description || "No description available"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -604,13 +340,13 @@ export default function VideoEditorPortfolio() {
             <div className="mb-16">
               <Card
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 max-w-md mx-auto"
-                onClick={() => openVideoModal("9bZkp7q19f0", "HOC LAN DAO PHU QUY")}
+                onClick={() => openVideoModal("QjR3DDjnijM", "Freelancing Dao Phu Quy", "Capcut Pc, Premiere Pro, After Effects", "Recent underwater freelancing project at Dao Phu Quy island.")}
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
-                      src="/backgroundVideo/3.jpg?height=200&width=400&text=HOC+LAN+DAO+PHU+QUY+Featured"
-                      alt="HOC LAN DAO PHU QUY"
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/backgroundVideo/3.jpg?height=200&width=400&text=Freelancing+Dao+Phu+Quy+Featured`}
+                      alt="Freelancing Dao Phu Quy"
                       width={400}
                       height={200}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
@@ -622,14 +358,14 @@ export default function VideoEditorPortfolio() {
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="text-center text-white">
-                        <div className="text-2xl font-bold mb-2">HOC LAN</div>
+                        <div className="text-2xl font-bold mb-2">FREELANCING</div>
                         <div className="bg-orange-500 px-4 py-1 rounded text-sm font-semibold">DAO PHU QUY</div>
                       </div>
                     </div>
                   </div>
                   <div className="p-6 text-center">
                     <h3 className="font-bold text-gray-900 mb-2">Freelancing Dao Phu Quy</h3>
-                    <p className="text-sm text-gray-600">November 30, 2023</p>
+                    <p className="text-sm text-gray-600">{recentProjects.find(p => p.video_id === "QjR3DDjnijM")?.date || "N/A"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -649,12 +385,12 @@ export default function VideoEditorPortfolio() {
               <Card
                 key={index}
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                onClick={() => openVideoModal(project.videoId, project.title, project.Software, project.description)}
+                onClick={() => openVideoModal(project.video_id, project.title, project.software, project.description)}
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
-                      src={project.thumbnail || "/placeholder.svg"}
+                      src={`${process.env.NEXT_PUBLIC_API_URL}${project.thumbnail_url}` || "/uploads/backgroundVideo/1.jpg"}
                       alt={project.title}
                       width={300}
                       height={150}
@@ -666,13 +402,13 @@ export default function VideoEditorPortfolio() {
                       </div>
                     </div>
                     <Badge className="absolute top-3 right-3 bg-red-600 text-white text-xs px-2 py-1">
-                      {project.views} views
+                      {project.views || "N/A"} views
                     </Badge>
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Tools:</a> {project.Software}</p>
-                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Date:</a> {project.date}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {project.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Date:</a> {project.date || "N/A"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -683,11 +419,9 @@ export default function VideoEditorPortfolio() {
         {/* Contact Section */}
         <div className="bg-white px-8 py-16 text-center">
           <h2 className="text-2xl font-bold text-black mb-6">You love my products???</h2>
-
           <Button className="bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-full font-medium text-lg mb-8">
             Contact me now
           </Button>
-
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
               <Phone className="w-5 h-5 text-blue-600" />
@@ -707,7 +441,7 @@ export default function VideoEditorPortfolio() {
         onClose={closeVideoModal}
         videoId={videoModal.videoId}
         title={videoModal.title}
-        Software={videoModal.Software}
+        software={videoModal.software}
         description={videoModal.description}
       />
     </div>
