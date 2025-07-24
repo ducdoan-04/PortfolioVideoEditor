@@ -5,8 +5,8 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play } from "lucide-react"
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X } from "lucide-react"
 // 
 // const portfolioCategories = [
 //   { id: "my-fav", name: "My Fav <3", active: true },
@@ -32,170 +32,248 @@ const portfolioData = {
     {
       title: "CORPORATE HOUSING",
       subtitle: "Business Promo",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Corporate+Housing",
+      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Corporate+Housing",
       duration: "2:15",
+      videoId: "dQw4w9WgXcQ", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Digital Nomad 2023",
       subtitle: "Lifestyle Brand",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Digital+Nomad",
+      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Digital+Nomad",
       duration: "4:45",
+      videoId: "jNQXAC9IVRw", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "HOC LAN DAO PHU QUY",
       subtitle: "Freelancing Dao Phu Quy",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Hoc+Lan+Dao+Phu+Quy",
+      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Hoc+Lan+Dao+Phu+Quy",
       duration: "5:20",
+      videoId: "9bZkp7q19f0", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "VIDEO EDITOR",
       subtitle: "Promotional Video",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Video+Editor+Promo",
+      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Video+Editor+Promo",
       duration: "3:30",
-    },
+      videoId: "ScMzIvxBSi4", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
+      },
   ],
   travel: [
     {
       title: "TAJIKISTAN HISOR",
       subtitle: "Travel Vlog",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Tajikistan+Travel",
+      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Tajikistan+Travel",
       duration: "8:45",
+      videoId: "ZXsQAXx_ao0", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "SAM MAY BA LAT",
       subtitle: "Travel Adventure",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Sam+May+Ba+Lat",
+      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Sam+May+Ba+Lat",
       duration: "6:30",
+      videoId: "kJQP7kiw5Fk", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "XUYEN VIET",
       subtitle: "Vietnam Journey",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Xuyen+Viet",
+      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Xuyen+Viet",
       duration: "12:15",
+      videoId: "L_jWHffIx5E", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "AM THANH BA LAT",
       subtitle: "Sound of Ba Lat",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Am+Thanh+Ba+Lat",
+      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Am+Thanh+Ba+Lat",
       duration: "4:20",
+      videoId: "fJ9rUzIMcZQ", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "PHUOT VIET NAM",
       subtitle: "Vietnam Adventure",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Phuot+Viet+Nam",
+      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Phuot+Viet+Nam",
       duration: "10:30",
+      videoId: "Ks-_Mh1QhMc", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "DA LAT JOURNEY",
       subtitle: "Highland Adventure",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Da+Lat+Journey",
+      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Da+Lat+Journey",
       duration: "7:15",
+      videoId: "hTWKbfoikeg", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
   tutorial: [
     {
       title: "HIEU BO SUA VIDEO",
       subtitle: "Video Editing Tutorial",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Video+Tutorial",
+      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Video+Tutorial",
       duration: "15:30",
+      videoId: "YQHsXMglC9A", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Nghien Cuu Thi Khoa Youtube",
       subtitle: "YouTube Research",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=YouTube+Research",
+      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=YouTube+Research",
       duration: "22:45",
+      videoId: "oHg5SJYRHA0", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Tap Khoa Youtube Chuan SEO",
       subtitle: "YouTube SEO Course",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=YouTube+SEO",
+      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=YouTube+SEO",
       duration: "18:20",
+      videoId: "RBumgq5yVrA", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "After Effects Basics",
       subtitle: "Motion Graphics Tutorial",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=After+Effects",
+      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=After+Effects",
       duration: "25:10",
+      videoId: "lTRiuFIWV54", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
   "real-estate": [
     {
       title: "An Gia Homestay",
       subtitle: "Property Tour",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=An+Gia+Homestay",
+      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=An+Gia+Homestay",
       duration: "3:45",
-    },
+      videoId: "M7lc1UVf-VE", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
+      },
     {
       title: "Dalant Villa",
       subtitle: "Luxury Property",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Dalant+Villa",
+      thumbnail: "/backgroundVideo/4.jpgheight=200&width=300&text=Dalant+Villa",
       duration: "4:20",
+      videoId: "QH2-TGUlwu4", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Moonlight House",
       subtitle: "Night Property",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Moonlight+House",
+      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Moonlight+House",
       duration: "2:55",
+      videoId: "nOHFR1xi2f8", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
   underwater: [
     {
       title: "Floating Freelancing",
       subtitle: "Underwater Scene",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Floating+Freelancing",
+      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Floating+Freelancing",
       duration: "2:30",
+      videoId: "SX_ViT4Ra7k", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Hair Freelancing",
       subtitle: "Underwater Scene",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Hair+Freelancing",
+      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Hair+Freelancing",
       duration: "1:45",
+      videoId: "iik25wqIuFo", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Heart Freelancing",
       subtitle: "Underwater Scene",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Heart+Freelancing",
+      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Heart+Freelancing",
       duration: "3:15",
+      videoId: "BaW_jenozKc", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
   brand: [
     {
       title: "PHUOT VAN BIEN DT 201",
       subtitle: "Brand Campaign",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Phuot+Van+Bien",
+      thumbnail: "/backgroundVideo/3.jpg?height=200&width=300&text=Phuot+Van+Bien",
       duration: "3:30",
+      videoId: "kffacxfA7G4", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "CORPORATE HOUSING",
       subtitle: "Business Promo",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Corporate+Brand",
+      thumbnail: "/backgroundVideo/4.jpg?height=200&width=300&text=Corporate+Brand",
       duration: "2:15",
+      videoId: "dQw4w9WgXcQ", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
   shorts: [
     {
       title: "Quick Edit Tips",
       subtitle: "Short Tutorial",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Quick+Tips",
+      thumbnail: "/backgroundVideo/5.jpg?height=200&width=300&text=Quick+Tips",
       duration: "0:45",
+      videoId: "jfKfPfyJRdk", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Color Grading Fast",
       subtitle: "Quick Guide",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Color+Grading",
+      thumbnail: "/backgroundVideo/6.jpg?height=200&width=300&text=Color+Grading",
       duration: "0:30",
+      videoId: "ixmxOlcrlUc", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Transition Effects",
       subtitle: "Quick Tutorial",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Transitions",
+      thumbnail: "/backgroundVideo/1.jpg?height=200&width=300&text=Transitions",
       duration: "0:55",
+      videoId: "hFZFjoX2cGg", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
     {
       title: "Audio Sync Tips",
       subtitle: "Quick Guide",
-      thumbnail: "/placeholder.svg?height=200&width=300&text=Audio+Sync",
+      thumbnail: "/backgroundVideo/2.jpg?height=200&width=300&text=Audio+Sync",
       duration: "0:40",
+      videoId: "09R8_2nJtjg", // Example YouTube video ID
+      Software: "Capcut Pc, Premiere Pro, After Effects",
+      description: "This is a description of the project",
     },
   ],
 }
@@ -204,24 +282,100 @@ const recentProjects = [
   {
     title: "Freelancing Dao Phu Quy",
     date: "November 30, 2023",
-    thumbnail: "/placeholder.svg?height=150&width=200&text=Recent+Project+1",
+    thumbnail: "/backgroundVideo/3.jpg?height=150&width=200&text=Recent+Project+1",
     views: "2.5K",
+    videoId: "QjR3DDjnijM", // Example YouTube video ID
+    Software: "Capcut Pc, Premiere Pro, After Effects",
+    description: "This is a description of the project",
   },
   {
     title: "Nghien Cuu Thi Khoa Youtube",
     date: "March 15, 2024",
-    thumbnail: "/placeholder.svg?height=150&width=200&text=Recent+Project+2",
+    thumbnail: "/backgroundVideo/4.jpg?height=150&width=200&text=Recent+Project+2",
     views: "15K",
+    videoId: "oHg5SJYRHA0", // Example YouTube video ID
+    Software: "Capcut Pc, Premiere Pro, After Effects",
+    description: "This is a description of the project",
   },
 ]
+
+// Video Modal Component
+function VideoModal({ isOpen, onClose, videoId, title, Software, description }) {
+  if (!isOpen || !videoId) return null
+
+  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      
+      <DialogContent className="max-w-4xl w-full p-0 bg-white flex flex-col md:flex-col">
+         {/* Video bên trái */}
+         <div className="relative md:w-3/3 w-full" style={{ paddingBottom: "56.25%" }}>
+          <iframe
+            src={embedUrl}
+            title={title}
+            className="absolute top-0 left-0 w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+        {/* Mô tả bên phải */}
+        <div className="md:w-3/3 w-full text-white flex flex-col ">
+          <DialogHeader className="pr-1 pl-4 pt-0 pb-0">
+            <div className="flex justify-between items-center">
+              <DialogTitle className="text-black text-2xl">{title}</DialogTitle>
+              <Button variant="ghost" size="sm" onClick={onClose} className="text-black bg-red-200 hover:bg-red-500 rounded-sm" >
+                <X className="w-2 h-2" />
+              </Button>
+            </div>
+          </DialogHeader>
+          <div className="block  text-sm text-gray-600 mb-4 ml-4">
+            <p className="pt-2"><a style={{textDecoration: "none", color: "black"}}>Tools:</a> {Software}</p>
+            <p className="pt-2"><a style={{textDecoration: "none", color: "black"}}>Description:</a> {description}</p>
+          </div>
+        </div>
+
+
+      </DialogContent>
+    </Dialog>
+  )
+}
 
 export default function VideoEditorPortfolio() {
   const [activeCategory, setActiveCategory] = useState("my-fav")
   const [currentData, setCurrentData] = useState(portfolioData["my-fav"])
+  const [videoModal, setVideoModal] = useState({
+    isOpen: false,
+    videoId: null,
+    title: "",
+    Software: "",
+    description: "",
+  })
 
   const handleCategoryChange = (categoryId) => {
     setActiveCategory(categoryId)
     setCurrentData(portfolioData[categoryId] || [])
+  }
+
+  const openVideoModal = (videoId, title, Software, description) => {
+    setVideoModal({
+      isOpen: true,
+      videoId: videoId,
+      title: title,
+      Software: Software,
+      description: description,
+    })
+  }
+
+  const closeVideoModal = () => {
+    setVideoModal({
+      isOpen: false,
+      videoId: null,
+      title: "",
+      Software: "",
+      description: "",
+    })
   }
 
   return (
@@ -414,18 +568,20 @@ export default function VideoEditorPortfolio() {
               <Card
                 key={index}
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-              >
+                onClick={() => openVideoModal(item.videoId, item.title, item.Software, item.description)}
+             >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
-                      src={item.thumbnail || "/placeholder.svg"}
+                      src={item.thumbnail || "/backgroundVideo/1.jpg"}
                       alt={item.title}
                       width={300}
                       height={200}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      {/* <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm"> */}
+                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
                         <Play className="w-8 h-8 text-white ml-1" />
                       </div>
                     </div>
@@ -435,7 +591,8 @@ export default function VideoEditorPortfolio() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-gray-900 mb-2 text-lg">{item.title}</h3>
-                    <p className="text-sm text-gray-600">{item.subtitle}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Tools:</a> {item.Software}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Description:</a> {item.description}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -445,18 +602,21 @@ export default function VideoEditorPortfolio() {
           {/* Featured Project for Underwater category */}
           {activeCategory === "underwater" && (
             <div className="mb-16">
-              <Card className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 max-w-md mx-auto">
+              <Card
+                className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 max-w-md mx-auto"
+                onClick={() => openVideoModal("9bZkp7q19f0", "HOC LAN DAO PHU QUY")}
+              >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
                     <Image
-                      src="/placeholder.svg?height=200&width=400&text=HOC+LAN+DAO+PHU+QUY+Featured"
+                      src="/backgroundVideo/3.jpg?height=200&width=400&text=HOC+LAN+DAO+PHU+QUY+Featured"
                       alt="HOC LAN DAO PHU QUY"
                       width={400}
                       height={200}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
                         <Play className="w-8 h-8 text-white ml-1" />
                       </div>
                     </div>
@@ -489,6 +649,7 @@ export default function VideoEditorPortfolio() {
               <Card
                 key={index}
                 className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                onClick={() => openVideoModal(project.videoId, project.title, project.Software, project.description)}
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
@@ -500,7 +661,7 @@ export default function VideoEditorPortfolio() {
                       className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
                         <Play className="w-6 h-6 text-white ml-1" />
                       </div>
                     </div>
@@ -510,7 +671,8 @@ export default function VideoEditorPortfolio() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <p className="text-sm text-gray-600">{project.date}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Tools:</a> {project.Software}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{textDecoration: "none", color: "black"}}>Date:</a> {project.date}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -529,7 +691,7 @@ export default function VideoEditorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
               <Phone className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-700 font-medium">+84919261712</span>
+              <span className="text-gray-700 font-medium">+84919261772</span>
             </div>
             <div className="flex items-center justify-center gap-3">
               <Mail className="w-5 h-5 text-red-600" />
@@ -538,6 +700,16 @@ export default function VideoEditorPortfolio() {
           </div>
         </div>
       </div>
+
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModal.isOpen}
+        onClose={closeVideoModal}
+        videoId={videoModal.videoId}
+        title={videoModal.title}
+        Software={videoModal.Software}
+        description={videoModal.description}
+      />
     </div>
   )
 }
