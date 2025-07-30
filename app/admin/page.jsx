@@ -22,6 +22,8 @@ import {
   Image as ImageIcon,
   Users
 } from "lucide-react"
+import Image from "next/image"
+import VideoThumbnail from "@/components/VideoThumbnail"
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -455,8 +457,8 @@ export default function AdminPage() {
             <Card key={video.id} className="group hover:shadow-lg transition-shadow">
               <CardContent className="p-0">
                 <div className="relative">
-                  <div className="w-full h-48 bg-gray-200 rounded-t-lg flex items-center justify-center">
-                    <Video className="w-12 h-12 text-gray-400" />
+                  <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                    <VideoThumbnail video={video} />
                   </div>
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2">

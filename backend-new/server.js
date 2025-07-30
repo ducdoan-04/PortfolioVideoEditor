@@ -26,8 +26,13 @@ app.use(cors({
   credentials: true,
 }));
 
-// Phục vụ file tĩnh từ thư mục uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Phục vụ file tĩnh từ thư mục uploads với CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static(path.join(__dirname, 'uploads')));
 
 // Parse JSON và URL-encoded
 app.use(express.json({ limit: '10mb' }));
@@ -99,6 +104,46 @@ const handleValidationErrors = (req, res, next) => {
 
 // API routes
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'Server đang hoạt động', timestamp: new Date().toISOString() }));
+
+// Test endpoint để kiểm tra file uploads
+app.get('/api/test-uploads', (req, res) => {
+  const fs = require('fs');
+  const uploadsPath = path.join(__dirname, 'uploads');
+  try {
+    const files = fs.readdirSync(uploadsPath);
+    res.json({ 
+      success: true, 
+      message: 'Uploads directory accessible',
+      files: files,
+      uploadsPath: uploadsPath
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error accessing uploads directory',
+      error: error.message 
+    });
+  }
+});
+
+// API endpoint để serve images
+app.get('/api/images/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'uploads', filename);
+  
+  // Kiểm tra file có tồn tại không
+  if (!fs.existsSync(imagePath)) {
+    return res.status(404).json({ success: false, message: 'Image not found' });
+  }
+  
+  // Set headers
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Cache-Control', 'public, max-age=31536000');
+  
+  // Send file
+  res.sendFile(imagePath);
+});
 
 app.get('/api/videos', asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
