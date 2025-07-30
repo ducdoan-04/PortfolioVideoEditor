@@ -254,42 +254,79 @@ app.get('/api/videos/:id', asyncHandler(async (req, res) => {
   res.json({ success: true, data: videos[0] });
 }));
 
-app.post('/api/videos', [
-  body('title').notEmpty().withMessage('Tiêu đề không được để trống'),
-  body('description').optional(),
-  body('video_id').notEmpty().withMessage('Video ID không được để trống'),
-  body('category').optional(),
-  body('thumbnail_url').optional().isURL().withMessage('URL thumbnail không hợp lệ'),
-], handleValidationErrors, asyncHandler(async (req, res) => {
-  const { title, description, video_id, category, thumbnail_url } = req.body;
+app.post('/api/videos', upload.single('thumbnail'), asyncHandler(async (req, res) => {
+  const { title, description, video_id, category, software } = req.body;
+  
+  if (!title || !video_id) {
+    return res.status(400).json({ success: false, message: 'Title and video_id are required' });
+  }
+
+  let thumbnail_url = null;
+  if (req.file) {
+    thumbnail_url = `/uploads/${req.file.filename}`;
+  }
+
   const [result] = await pool.execute(
-    'INSERT INTO videos (title, description, video_id, category, thumbnail_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
-    [title, description, video_id, category, thumbnail_url]
+    'INSERT INTO videos (title, description, video_id, category, software, thumbnail_url, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())',
+    [title, description, video_id, category, software, thumbnail_url]
   );
+  
   res.status(201).json({
     success: true,
     message: 'Thêm video thành công',
-    data: { id: result.insertId, title, description, video_id, category, thumbnail_url },
+    data: { id: result.insertId, title, description, video_id, category, software, thumbnail_url },
   });
 }));
 
-app.put('/api/videos/:id', [
-  body('title').optional().notEmpty().withMessage('Tiêu đề không được để trống'),
-  body('description').optional(),
-  body('video_id').optional().notEmpty().withMessage('Video ID không được để trống'),
-  body('category').optional(),
-  body('thumbnail_url').optional().isURL().withMessage('URL thumbnail không hợp lệ'),
-], handleValidationErrors, asyncHandler(async (req, res) => {
+app.put('/api/videos/:id', upload.single('thumbnail'), asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const { title, description, video_id, category, software } = req.body;
+  
+  // Check if video exists
   const [existing] = await pool.execute('SELECT id FROM videos WHERE id = ?', [id]);
-  if (existing.length === 0) return res.status(404).json({ success: false, message: 'Không tìm thấy video' });
+  if (existing.length === 0) {
+    return res.status(404).json({ success: false, message: 'Video not found' });
+  }
 
-  const fields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
-  const values = Object.values(updates);
-  values.push(id);
+  let thumbnail_url = null;
+  if (req.file) {
+    thumbnail_url = `/uploads/${req.file.filename}`;
+  }
 
-  await pool.execute(`UPDATE videos SET ${fields}, updated_at = NOW() WHERE id = ?`, values);
+  const updateFields = [];
+  const updateValues = [];
+
+  if (title) {
+    updateFields.push('title = ?');
+    updateValues.push(title);
+  }
+  if (description !== undefined) {
+    updateFields.push('description = ?');
+    updateValues.push(description);
+  }
+  if (video_id) {
+    updateFields.push('video_id = ?');
+    updateValues.push(video_id);
+  }
+  if (software !== undefined) {
+    updateFields.push('software = ?');
+    updateValues.push(software);
+  }
+  if (category !== undefined) {
+    updateFields.push('category = ?');
+    updateValues.push(category);
+  }
+  if (thumbnail_url) {
+    updateFields.push('thumbnail_url = ?');
+    updateValues.push(thumbnail_url);
+  }
+
+  updateFields.push('updated_at = NOW()');
+  updateValues.push(id);
+
+  const sql = `UPDATE videos SET ${updateFields.join(', ')} WHERE id = ?`;
+  await pool.execute(sql, updateValues);
+
   res.json({ success: true, message: 'Cập nhật video thành công' });
 }));
 
@@ -308,6 +345,90 @@ app.post('/api/upload', upload.single('file'), asyncHandler(async (req, res) => 
     message: 'Upload file thành công',
     data: { filename: req.file.filename, originalname: req.file.originalname, size: req.file.size, url: fileUrl },
   });
+}));
+
+// Admin Login
+app.post('/api/admin/login', [
+  body('username').notEmpty().withMessage('Username is required'),
+  body('password').notEmpty().withMessage('Password is required'),
+], handleValidationErrors, asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    // Check user in database
+    const [users] = await pool.execute(
+      'SELECT id, username, password, role, is_active FROM users WHERE username = ?',
+      [username]
+    );
+
+    if (users.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: `User '${username}' not found in database`
+      });
+    }
+
+    const user = users[0];
+
+    // Check if user is active
+    if (!user.is_active) {
+      return res.status(401).json({
+        success: false,
+        message: `Account '${username}' is deactivated`
+      });
+    }
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. User '${username}' has role '${user.role}' but admin role is required.`
+      });
+    }
+
+    // Simple password check (in production, use bcrypt)
+    if (password === 'admin123') {
+      const token = `admin-token-${user.id}-${Date.now()}`;
+      res.json({
+        success: true,
+        message: `Login successful! Welcome ${user.username} (${user.role})`,
+        token: token,
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: `Invalid password for user '${username}'`
+      });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Login failed'
+    });
+  }
+}));
+
+// Admin Token Verification
+app.get('/api/admin/verify', asyncHandler(async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: 'Access token required' });
+  }
+
+  const token = authHeader.substring(7);
+  
+  // Simple token verification (in production, use JWT)
+  if (token.startsWith('admin-token-')) {
+    res.json({ success: true, message: 'Token is valid' });
+  } else {
+    res.status(401).json({ success: false, message: 'Invalid token' });
+  }
 }));
 
 app.use((error, req, res, next) => {
