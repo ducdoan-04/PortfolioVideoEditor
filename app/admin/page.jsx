@@ -20,22 +20,24 @@ import {
   Upload, 
   Video, 
   Image as ImageIcon,
-  Users
+  Users,
+  Tag
 } from "lucide-react"
 import Image from "next/image"
 import VideoThumbnail from "@/components/VideoThumbnail"
+import AdminLogin from "./login/page.jsx"
+import CategoryManagement from "@/components/CategoryManagement"
+import UserManagement from "@/components/UserManagement"
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [videos, setVideos] = useState([])
   const [categories, setCategories] = useState([])
+  const [users, setUsers] = useState([])
   const [showAddVideo, setShowAddVideo] = useState(false)
   const [showEditVideo, setShowEditVideo] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState(null)
-  const [loginStatus, setLoginStatus] = useState('')
-  const [showSuccessDialog, setShowSuccessDialog] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('')
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -44,15 +46,29 @@ export default function AdminPage() {
     category: "",
     thumbnail: null
   })
+  const [activeTab, setActiveTab] = useState("videos")
 
-  // Check authentication on mount
+  // Check authentication on mount and when localStorage changes
   useEffect(() => {
     checkAuth()
   }, [])
 
+  // Listen for localStorage changes (when user logs in from separate login page)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const token = localStorage.getItem('admin-token')
+      if (token && !isLoggedIn) {
+        checkAuth()
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [isLoggedIn])
+
   const checkAuth = async () => {
     try {
-      const token = localStorage.getItem('adminToken')
+      const token = localStorage.getItem('admin-token')
       if (!token) {
         setIsLoggedIn(false)
         setIsLoading(false)
@@ -60,7 +76,8 @@ export default function AdminPage() {
       }
 
       // Verify token with backend
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/verify`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/admin/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,8 +87,8 @@ export default function AdminPage() {
         setIsLoggedIn(true)
         fetchData()
       } else {
-        localStorage.removeItem('adminToken')
-        localStorage.removeItem('adminUser')
+        localStorage.removeItem('admin-token')
+        localStorage.removeItem('admin-user')
         setIsLoggedIn(false)
       }
     } catch (error) {
@@ -84,13 +101,16 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const [videosRes, categoriesRes] = await Promise.all([
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`),
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`)
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const [videosRes, categoriesRes, usersRes] = await Promise.all([
+        fetch(`${apiUrl}/api/videos`),
+        fetch(`${apiUrl}/api/categories`),
+        fetch(`${apiUrl}/api/users`)
       ])
 
       const videosData = await videosRes.json()
       const categoriesData = await categoriesRes.json()
+      const usersData = await usersRes.json()
 
       if (videosData.success) {
         setVideos(videosData.data.videos)
@@ -98,55 +118,48 @@ export default function AdminPage() {
       if (categoriesData.success) {
         setCategories(categoriesData.data)
       }
+      if (usersData.success) {
+        setUsers(usersData.data)
+      }
     } catch (error) {
       console.error('Error fetching data:', error)
       toast.error('Failed to load data')
     }
   }
 
-  const handleLogin = async (e) => {
-    e.preventDefault()
-    setLoginStatus('Đang đăng nhập...')
-    
-    const formData = new FormData(e.target)
-    const username = formData.get('username')
-    const password = formData.get('password')
 
+
+  const handleLogout = () => {
+    localStorage.removeItem('admin-token')
+    localStorage.removeItem('admin-user')
+    setIsLoggedIn(false)
+    toast.success('Logged out successfully')
+  }
+
+  const handleDeleteAllVideos = async () => {
+    toast.loading('Đang xóa tất cả videos...')
+    
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, password })
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/videos`, {
+        method: 'DELETE'
       })
 
       const data = await response.json()
 
       if (data.success) {
-        localStorage.setItem('adminToken', data.token)
-        localStorage.setItem('adminUser', JSON.stringify(data.user))
-        setIsLoggedIn(true)
-        setSuccessMessage(data.message || 'Đăng nhập thành công!')
-        setShowSuccessDialog(true)
+        toast.dismiss()
+        toast.success(`Đã xóa tất cả videos thành công! (${data.deletedCount} videos)`)
         fetchData()
       } else {
-        setLoginStatus(data.message || 'Đăng nhập thất bại')
-        toast.error(data.message || 'Login failed')
-        console.log('Login failed:', data)
+        toast.dismiss()
+        toast.error(data.message || 'Xóa tất cả videos thất bại')
       }
     } catch (error) {
-      console.error('Login error:', error)
-      setLoginStatus('Lỗi kết nối server')
-      toast.error('Login failed')
+      console.error('Error deleting all videos:', error)
+      toast.dismiss()
+      toast.error('Lỗi kết nối server')
     }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    localStorage.removeItem('adminUser')
-    setIsLoggedIn(false)
-    toast.success('Logged out successfully')
   }
 
   const handleAddVideo = async (e) => {
@@ -162,7 +175,8 @@ export default function AdminPage() {
         }
       })
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/videos`, {
         method: 'POST',
         body: formDataToSend
       })
@@ -200,13 +214,20 @@ export default function AdminPage() {
     try {
       const formDataToSend = new FormData()
       
+      // Gửi tất cả các field text
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== '') {
+        if (key !== 'thumbnail' && formData[key] !== null && formData[key] !== '') {
           formDataToSend.append(key, formData[key])
         }
       })
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/${selectedVideo.id}`, {
+      // Chỉ thêm thumbnail nếu có file mới được chọn (File object)
+      if (formData.thumbnail && formData.thumbnail instanceof File) {
+        formDataToSend.append('thumbnail', formData.thumbnail)
+      }
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/videos/${selectedVideo.id}`, {
         method: 'PUT',
         body: formDataToSend
       })
@@ -244,7 +265,8 @@ export default function AdminPage() {
     toast.loading('Đang xóa video...')
     
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/${videoId}`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
         method: 'DELETE'
       })
 
@@ -273,7 +295,7 @@ export default function AdminPage() {
       video_id: video.video_id,
       software: video.software,
       category: video.category,
-      thumbnail: null
+      thumbnail: null // Luôn reset về null khi mở form edit
     })
     setShowEditVideo(true)
   }
@@ -297,55 +319,7 @@ export default function AdminPage() {
   }
 
   if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Admin Login</CardTitle>
-            <p className="text-gray-600">Enter your credentials to access the admin panel</p>
-          </CardHeader>
-          <CardContent>
-                      <form onSubmit={handleLogin} className="space-y-4">
-
-            <div>
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                name="username"
-                type="text"
-                required
-                placeholder="Enter username"
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                placeholder="Enter password"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loginStatus === 'Đang đăng nhập...'}>
-              {loginStatus === 'Đang đăng nhập...' ? 'Đang đăng nhập...' : 'Login'}
-            </Button>
-            {loginStatus && (
-              <div className={`text-sm p-2 rounded ${
-                loginStatus.includes('thành công') 
-                  ? 'bg-green-100 text-green-800 border border-green-200' 
-                  : loginStatus.includes('Đang đăng nhập') 
-                  ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                  : 'bg-red-100 text-red-800 border border-red-200'
-              }`}>
-                {loginStatus}
-              </div>
-            )}
-          </form>
-          </CardContent>
-        </Card>
-      </div>
-    )
+    return <AdminLogin />
   }
 
   return (
@@ -360,7 +334,7 @@ export default function AdminPage() {
                 {videos.length} Videos
               </Badge>
               {(() => {
-                const userStr = localStorage.getItem('adminUser')
+                const userStr = localStorage.getItem('admin-user')
                 if (userStr) {
                   const user = JSON.parse(userStr)
                   return (
@@ -432,80 +406,137 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Active Users</p>
-                  <p className="text-2xl font-bold text-gray-900">-</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {users.filter(user => user.is_active).length}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Actions */}
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Video Management</h2>
+        {/* Tabs Navigation */}
+        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
           <Button
-            onClick={() => setShowAddVideo(true)}
+            variant={activeTab === "videos" ? "default" : "ghost"}
+            onClick={() => setActiveTab("videos")}
             className="flex items-center space-x-2"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add Video</span>
+            <Video className="w-4 h-4" />
+            <span>Videos</span>
+          </Button>
+          <Button
+            variant={activeTab === "categories" ? "default" : "ghost"}
+            onClick={() => setActiveTab("categories")}
+            className="flex items-center space-x-2"
+          >
+            <Tag className="w-4 h-4" />
+            <span>Categories</span>
+          </Button>
+          <Button
+            variant={activeTab === "users" ? "default" : "ghost"}
+            onClick={() => setActiveTab("users")}
+            className="flex items-center space-x-2"
+          >
+            <Users className="w-4 h-4" />
+            <span>Users</span>
           </Button>
         </div>
 
-        {/* Videos Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {videos.map((video) => (
-            <Card key={video.id} className="group hover:shadow-lg transition-shadow">
-              <CardContent className="p-0">
-                <div className="relative">
-                  <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
-                    <VideoThumbnail video={video} />
-                  </div>
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => openEditVideo(video)}
-                        className="bg-white text-gray-900 hover:bg-gray-100"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleDeleteVideo(video.id)}
-                        className="bg-red-600 hover:bg-red-700"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h3>
-                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">{video.description}</p>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">
-                      {video.category || 'Unknown'}
-                    </Badge>
-                    <span className="text-xs text-gray-500">{video.duration || 'N/A'}</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Tab Content */}
+        {activeTab === "videos" && (
+          <>
+            {/* Actions */}
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Video Management</h2>
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  onClick={() => {
+                    if (confirm('Bạn có chắc muốn xóa TẤT CẢ videos? Hành động này không thể hoàn tác!')) {
+                      handleDeleteAllVideos();
+                    }
+                  }}
+                  className="flex items-center space-x-2"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete All</span>
+                </Button>
+                <Button
+                  onClick={() => setShowAddVideo(true)}
+                  className="flex items-center space-x-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Add Video</span>
+                </Button>
+              </div>
+            </div>
 
-        {videos.length === 0 && (
-          <div className="text-center py-12">
-            <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No videos yet</h3>
-            <p className="text-gray-600 mb-4">Get started by adding your first video</p>
-            <Button onClick={() => setShowAddVideo(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Video
-            </Button>
-          </div>
+            {/* Videos Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.isArray(videos) && videos.map((video) => (
+                <Card key={video.id} className="group hover:shadow-lg transition-shadow">
+                  <CardContent className="p-0">
+                    <div className="relative">
+                      <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+                        <VideoThumbnail video={video} />
+                      </div>
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => openEditVideo(video)}
+                            className="bg-white text-gray-900 hover:bg-gray-100"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteVideo(video.id)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">{video.title}</h3>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">{video.description}</p>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs">
+                          {video.category || 'Unknown'}
+                        </Badge>
+                        <span className="text-xs text-gray-500">{video.duration || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {(!Array.isArray(videos) || videos.length === 0) && (
+              <div className="text-center py-12">
+                <Video className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No videos yet</h3>
+                <p className="text-gray-600 mb-4">Get started by adding your first video</p>
+                <Button onClick={() => setShowAddVideo(true)}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Video
+                </Button>
+              </div>
+            )}
+          </>
+        )}
+
+        {activeTab === "categories" && (
+          <CategoryManagement categories={categories} onCategoriesChange={fetchData} />
+        )}
+
+        {activeTab === "users" && (
+          <UserManagement users={users} onUsersChange={fetchData} />
         )}
       </div>
 
@@ -662,7 +693,36 @@ export default function AdminPage() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="edit-thumbnail">Thumbnail Image (optional)</Label>
+              <Label htmlFor="edit-thumbnail">Thumbnail Image</Label>
+              
+              {/* Hiển thị ảnh hiện tại */}
+              {selectedVideo && (
+                <div className="mb-3">
+                  <p className="text-sm text-gray-600 mb-2">Current thumbnail:</p>
+                  <div className="relative w-32 h-20 bg-gray-100 rounded-lg overflow-hidden">
+                    {selectedVideo.thumbnail_url ? (
+                      <img
+                        src={selectedVideo.thumbnail_url.startsWith('http') 
+                          ? selectedVideo.thumbnail_url 
+                          : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${selectedVideo.thumbnail_url}`
+                        }
+                        alt="Current thumbnail"
+                        className="w-full h-full object-cover"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          e.target.src = '/placeholder.jpg'
+                        }}
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                        No thumbnail
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              )}
+              
               <Input
                 id="edit-thumbnail"
                 type="file"
@@ -670,7 +730,21 @@ export default function AdminPage() {
                 onChange={handleFileChange}
                 className="cursor-pointer"
               />
-              <p className="text-sm text-gray-500 mt-1">Upload a new thumbnail image (leave empty to keep current)</p>
+              
+              {/* Hiển thị file mới được chọn */}
+              {formData.thumbnail && formData.thumbnail instanceof File && (
+                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                  <p className="text-sm text-blue-800">
+                    <strong>New file selected:</strong> {formData.thumbnail.name}
+                  </p>
+                </div>
+              )}
+              
+              <p className="text-sm text-gray-500 mt-1">
+                {selectedVideo && selectedVideo.thumbnail_url 
+                  ? "Upload a new thumbnail image (leave empty to keep current)" 
+                  : "Upload a thumbnail image"}
+              </p>
             </div>
             <div className="flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={() => setShowEditVideo(false)}>
@@ -685,27 +759,7 @@ export default function AdminPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Success Login Dialog */}
-      <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-              </div>
-              Đăng nhập thành công!
-            </DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-gray-600">{successMessage}</p>
-          </div>
-          <div className="flex justify-end">
-            <Button onClick={() => setShowSuccessDialog(false)}>
-              Tiếp tục
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+
 
       {/* Toaster for notifications */}
       <Toaster />

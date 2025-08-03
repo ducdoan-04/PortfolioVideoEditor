@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X } from "lucide-react"
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X, User } from 'lucide-react'
 
 // Video Modal Component
 function VideoModal({ isOpen, onClose, videoId, title, software, description }) {
@@ -49,11 +49,12 @@ function VideoModal({ isOpen, onClose, videoId, title, software, description }) 
 }
 
 export default function VideoEditorPortfolio() {
-  const [activeCategory, setActiveCategory] = useState("my-fav")
+  const [activeCategory, setActiveCategory] = useState(null)
   const [currentData, setCurrentData] = useState([])
   const [categories, setCategories] = useState([])
   const [recentProjects, setRecentProjects] = useState([])
   const [loading, setLoading] = useState(true)
+  const [videosLoading, setVideosLoading] = useState(false)
   const [videoModal, setVideoModal] = useState({
     isOpen: false,
     videoId: null,
@@ -63,74 +64,92 @@ export default function VideoEditorPortfolio() {
   })
 
   // Fetch data from backend
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const categoriesResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`);
-          const categoriesData = await categoriesResp.json();
-          if (categoriesData.success) {
-            const mappedCategories = categoriesData.data.map(cat => ({
-              id: cat.id,
-              name: cat.name, // Sử dụng cat.name
-              description: cat.description,
-              color: cat.color,
-              created_at: cat.created_at,
-              active: cat.id === 1, // Mặc định active là category có id = 1
-            }));
-            setCategories(mappedCategories);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+        
+        const categoriesResp = await fetch(`${apiUrl}/api/categories`);
+        const categoriesData = await categoriesResp.json();
+        if (categoriesData.success) {
+          const mappedCategories = categoriesData.data.map(cat => ({
+            id: cat.id,
+            name: cat.name,
+            description: cat.description,
+            color: cat.color,
+            created_at: cat.created_at,
+            active: cat.id === 1,
+          }));
+          setCategories(mappedCategories);
+          
+          // Set default category to first category
+          if (mappedCategories.length > 0) {
+            setActiveCategory(mappedCategories[0].id);
+            console.log('Setting default category:', mappedCategories[0].name, mappedCategories[0].id);
           }
-
-          const videosResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos?category=${categories.find(cat => cat.id === 1)?.name || 'my-fav'}`);
-          const videosData = await videosResp.json();
-          if (videosData.success) {
-            setCurrentData(videosData.data.videos.map(video => ({
-              ...video,
-              thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
-              duration: video.duration || "N/A",
-            })));
-          }
-
-          const recentResp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos/recent?limit=2`);
-          const recentData = await recentResp.json();
-          if (recentData.success) {
-            setRecentProjects(recentData.data.map(video => ({
-              ...video,
-              thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
-              views: video.views ? `${video.views}K` : "N/A",
-              date: video.created_at ? new Date(video.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
-            })));
-          }
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        } finally {
-          setLoading(false);
         }
-      };
-      fetchData();
-    }, []);
+
+        const videosResp = await fetch(`${apiUrl}/api/videos?category=${encodeURIComponent(categoriesData.success && categoriesData.data.length > 0 ? categoriesData.data[0].name : '')}`);
+        const videosData = await videosResp.json();
+        if (videosData.success) {
+          console.log('Videos fetched:', videosData.data.videos.length);
+          setCurrentData(videosData.data.videos.map(video => {
+            const thumbnailUrl = video.thumbnail_url 
+              ? `${apiUrl}${video.thumbnail_url}`
+              : "/backgroundVideo/1.jpg";
+            console.log('Video thumbnail URL:', thumbnailUrl);
+            return {
+              ...video,
+              thumbnail: thumbnailUrl,
+              duration: video.duration || "N/A",
+            };
+          }));
+        }
+
+        const recentResp = await fetch(`${apiUrl}/api/videos/recent?limit=2`);
+        const recentData = await recentResp.json();
+        if (recentData.success) {
+          setRecentProjects(recentData.data.map(video => ({
+            ...video,
+            thumbnail: video.thumbnail_url 
+              ? `${apiUrl}${video.thumbnail_url}`
+              : "/backgroundVideo/1.jpg",
+            views: video.views ? `${video.views}K` : "N/A",
+            date: video.created_at ? new Date(video.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
+          })));
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   // Handle category change
   const handleCategoryChange = async (categoryId) => {
     setActiveCategory(categoryId);
-    setLoading(true);
+    setVideosLoading(true);
     try {
-      const resp = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/videos?category=${categories.find(cat => cat.id === categoryId)?.name}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const resp = await fetch(`${apiUrl}/api/videos?category=${encodeURIComponent(categories.find(cat => cat.id === categoryId)?.name || '')}`);
       const data = await resp.json();
       if (data.success) {
         setCurrentData(data.data.videos.map(video => ({
           ...video,
-          thumbnail: video.thumbnail_url || "/backgroundVideo/1.jpg",
+          thumbnail: video.thumbnail_url 
+            ? `${apiUrl}${video.thumbnail_url}`
+            : "/backgroundVideo/1.jpg",
           duration: video.duration || "N/A",
         })));
       }
     } catch (error) {
       console.error("Error fetching category data:", error);
     } finally {
-      setLoading(false);
+      setVideosLoading(false);
     }
   };
-
-
 
   const openVideoModal = (videoId, title, software, description) => {
     setVideoModal({ isOpen: true, videoId, title, software, description })
@@ -140,16 +159,30 @@ export default function VideoEditorPortfolio() {
     setVideoModal({ isOpen: false, videoId: null, title: "", software: "", description: "" })
   }
 
+  const handleLogin = () => {
+    window.location.href = '/admin'
+  }
+
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">Loading...</div>
 
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Page Title */}
-      <div className="bg-white px-6 py-3 border-b" style={{ backgroundColor: "white", display: "none" }}>
-        <div className="max-w-6xl mx-auto flex justify-between items-center">
+      <div className="bg-white px-6 py-3 border-b">
+        <div className="max-w-6xl mx-auto flex justify-between items-center" style={{display: "none"}}>
           <h1 className="text-gray-400 font-medium">DoanPortfolio (My Fav {"<3"})</h1>
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-xs font-bold">✓</span>
+          <div className="flex items-center space-x-4">
+            <Button
+              variant="outline"
+              onClick={handleLogin}
+              className="flex items-center space-x-2"
+            >
+              <User className="w-4 h-4" />
+              <span>Admin</span>
+            </Button>
+            <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+              <span className="text-white text-xs font-bold">✓</span>
+            </div>
           </div>
         </div>
       </div>
@@ -213,7 +246,7 @@ export default function VideoEditorPortfolio() {
               <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-8 md:mt-0">HO DUC DOAN</h1>
               <p className="text-gray-500 font-medium text-lg mb-2">Hi there!</p>
               <p className="text-gray-600 leading-relaxed mb-6 max-w-lg">
-                I’m Doan a passionate video editor with 4 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
+                I'm Doan a passionate video editor with 4 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
               </p>
 
               <div className="space-y-3 mb-8">
@@ -235,8 +268,8 @@ export default function VideoEditorPortfolio() {
 
               <a href="mailto:ducdoan04.work@gmail.com" className="mb-4">
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium text-base">
-                 Contact me now
-              </Button>
+                  Contact me now
+                </Button>
               </a>
             </div>
           </div>
@@ -276,7 +309,7 @@ export default function VideoEditorPortfolio() {
         </div>
 
         {/* Portfolio Section */}
-        <div className=" pt-4 pb-1 px-8 py-12 text-center">
+        <div className="pt-4 pb-1 px-8 py-12 text-center">
           <h2 className="text-3xl font-bold text-black mb-4">My Portfolio</h2>
           <p className="text-gray-600 mb-12">Have a look on my products, I'm sure you will love it.</p>
 
@@ -286,7 +319,10 @@ export default function VideoEditorPortfolio() {
               <Button
                 key={category.id}
                 variant={activeCategory === category.id ? "default" : "ghost"}
-                onClick={() => handleCategoryChange(category.id)}
+                onClick={() => {
+                  console.log('Category clicked:', category.name, category.id);
+                  handleCategoryChange(category.id);
+                }}
                 className={`px-6 py-3 rounded-full font-medium transition-all ${
                   activeCategory === category.id
                     ? "bg-blue-500 text-white hover:bg-blue-600"
@@ -300,39 +336,61 @@ export default function VideoEditorPortfolio() {
 
           {/* Portfolio Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {currentData.map((item, index) => (
-              <Card
-                key={index}
-                className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
-                onClick={() => openVideoModal(item.video_id, item.title, item.software, item.description)}
-              >
-                <CardContent className="p-0">
-                  <div className="relative overflow-hidden rounded-t-lg">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${item.thumbnail_url}` || "/uploads/backgroundVideo/1.jpg"}
-                      alt={item.title}
-                      width={300}
-                      height={200}
-                      className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                      onError={(e) => console.log("Image failed to load:", e.target.src)}
-                   />
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                        <Play className="w-8 h-8 text-white ml-1" />
-                      </div>
+            {videosLoading ? (
+              // Loading skeleton
+              Array.from({ length: 6 }).map((_, index) => (
+                <Card key={`skeleton-${index}`} className="animate-pulse">
+                  <CardContent className="p-0">
+                    <div className="w-full h-48 bg-gray-200 rounded-t-lg"></div>
+                    <div className="p-6">
+                      <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded mb-1"></div>
+                      <div className="h-4 bg-gray-200 rounded"></div>
                     </div>
-                    <Badge className="absolute top-3 right-3 bg-black bg-opacity-80 text-white text-xs px-2 py-1">
-                      {item.duration || "N/A"}
-                    </Badge>
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-bold text-gray-900 mb-2 text-lg">{item.title}</h3>
-                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {item.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
-                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Description:</a> {item.description || "No description available"}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              currentData.map((item, index) => (
+                <Card
+                  key={index}
+                  className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                  onClick={() => openVideoModal(item.video_id, item.title, item.software, item.description)}
+                >
+                  <CardContent className="p-0">
+                    <div className="relative overflow-hidden rounded-t-lg">
+                      <img
+                        src={item.thumbnail}
+                        alt={item.title}
+                        crossOrigin="anonymous"
+                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          console.log('Image load error for:', item.thumbnail);
+                          console.log('Error details:', e.target.src);
+                          e.target.src = "/placeholder.jpg"
+                        }}
+                        onLoad={() => {
+                          console.log('Image loaded successfully:', item.thumbnail);
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+                          <Play className="w-8 h-8 text-white ml-1" />
+                        </div>
+                      </div>
+                      <Badge className="absolute top-3 right-3 bg-black bg-opacity-80 text-white text-xs px-2 py-1">
+                        {item.duration || "N/A"}
+                      </Badge>
+                    </div>
+                    <div className="p-6">
+                      <h3 className="font-bold text-gray-900 mb-2 text-lg">{item.title}</h3>
+                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {item.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Description:</a> {item.description || "No description available"}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
 
           {/* Featured Project for Underwater category */}
@@ -344,11 +402,9 @@ export default function VideoEditorPortfolio() {
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/uploads/backgroundVideo/3.jpg?height=200&width=400&text=Freelancing+Dao+Phu+Quy+Featured`}
+                    <img
+                      src="/backgroundVideo/3.jpg"
                       alt="Freelancing Dao Phu Quy"
-                      width={400}
-                      height={200}
                       className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -389,12 +445,18 @@ export default function VideoEditorPortfolio() {
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden rounded-t-lg">
-                    <Image
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${project.thumbnail_url}` || "/uploads/backgroundVideo/1.jpg"}
+                    <img
+                      src={project.thumbnail}
                       alt={project.title}
-                      width={300}
-                      height={150}
+                      crossOrigin="anonymous"
                       className="w-full h-40 object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => {
+                        console.log('Recent project image error:', project.thumbnail);
+                        e.target.src = "/placeholder.jpg"
+                      }}
+                      onLoad={() => {
+                        console.log('Recent project image loaded:', project.thumbnail);
+                      }}
                     />
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">

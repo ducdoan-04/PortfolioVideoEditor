@@ -284,12 +284,62 @@ app.get('/api/stats', asyncHandler(async (req, res) => {
   });
 }));
 
+// Categories API
 app.get('/api/categories', asyncHandler(async (req, res) => {
   const [categories] = await pool.execute(`
-    SELECT id, name, description, color, created_at FROM categories -- Sử dụng các cột thực tế
+    SELECT id, name, description, color, created_at FROM categories
     WHERE name IS NOT NULL AND name != '' ORDER BY id ASC
   `);
   res.json({ success: true, data: categories });
+}));
+
+app.post('/api/categories', [
+  body('name').notEmpty().withMessage('Name is required'),
+], handleValidationErrors, asyncHandler(async (req, res) => {
+  const { name, description, color } = req.body;
+
+  const [result] = await pool.execute(
+    'INSERT INTO categories (name, description, color, created_at) VALUES (?, ?, ?, NOW())',
+    [name, description, color || '#3B82F6']
+  );
+  
+  res.status(201).json({
+    success: true,
+    message: 'Category added successfully',
+    data: { id: result.insertId, name, description, color }
+  });
+}));
+
+app.put('/api/categories/:id', [
+  body('name').notEmpty().withMessage('Name is required'),
+], handleValidationErrors, asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { name, description, color } = req.body;
+  
+  const [existing] = await pool.execute('SELECT id FROM categories WHERE id = ?', [id]);
+  if (existing.length === 0) {
+    return res.status(404).json({ success: false, message: 'Category not found' });
+  }
+
+  await pool.execute(
+    'UPDATE categories SET name = ?, description = ?, color = ? WHERE id = ?',
+    [name, description, color, id]
+  );
+  
+  res.json({ success: true, message: 'Category updated successfully' });
+}));
+
+app.delete('/api/categories/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  const [existing] = await pool.execute('SELECT id FROM categories WHERE id = ?', [id]);
+  if (existing.length === 0) {
+    return res.status(404).json({ success: false, message: 'Category not found' });
+  }
+
+  await pool.execute('DELETE FROM categories WHERE id = ?', [id]);
+  
+  res.json({ success: true, message: 'Category deleted successfully' });
 }));
 
 app.get('/api/videos/:id', asyncHandler(async (req, res) => {
@@ -382,6 +432,17 @@ app.delete('/api/videos/:id', asyncHandler(async (req, res) => {
   res.json({ success: true, message: 'Xóa video thành công' });
 }));
 
+// Delete all videos
+app.delete('/api/videos', asyncHandler(async (req, res) => {
+  const [result] = await pool.execute('DELETE FROM videos');
+  
+  res.json({ 
+    success: true, 
+    message: `All videos deleted successfully`,
+    deletedCount: result.affectedRows
+  });
+}));
+
 app.post('/api/upload', upload.single('file'), asyncHandler(async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: 'Không có file nào được upload' });
   const fileUrl = `/uploads/${req.file.filename}`;
@@ -431,8 +492,10 @@ app.post('/api/admin/login', [
       });
     }
 
-    // Simple password check (in production, use bcrypt)
-    if (password === 'admin123') {
+    // Check password using bcrypt
+    const bcrypt = require('bcrypt');
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
       const token = `admin-token-${user.id}-${Date.now()}`;
       res.json({
         success: true,
@@ -474,6 +537,87 @@ app.get('/api/admin/verify', asyncHandler(async (req, res) => {
   } else {
     res.status(401).json({ success: false, message: 'Invalid token' });
   }
+}));
+
+// Users API
+app.get('/api/users', asyncHandler(async (req, res) => {
+  const [users] = await pool.execute('SELECT id, username, email, role, is_active, created_at FROM users ORDER BY id ASC');
+  res.json({ success: true, data: users });
+}));
+
+app.post('/api/users', [
+  body('username').notEmpty().withMessage('Username is required'),
+  body('password').notEmpty().withMessage('Password is required'),
+], handleValidationErrors, asyncHandler(async (req, res) => {
+  const { username, email, password, role, is_active } = req.body;
+  
+  // Check if username already exists
+  const [existing] = await pool.execute('SELECT id FROM users WHERE username = ?', [username]);
+  if (existing.length > 0) {
+    return res.status(400).json({ success: false, message: 'Username already exists' });
+  }
+  
+  const bcrypt = require('bcrypt');
+  const hashedPassword = await bcrypt.hash(password, 10);
+  
+  const [result] = await pool.execute(
+    'INSERT INTO users (username, email, password, role, is_active, created_at) VALUES (?, ?, ?, ?, ?, NOW())',
+    [username, email, hashedPassword, role || 'user', is_active !== false]
+  );
+  
+  res.status(201).json({
+    success: true,
+    message: 'User added successfully',
+    data: { id: result.insertId, username, email, role, is_active }
+  });
+}));
+
+app.put('/api/users/:id', [
+  body('username').notEmpty().withMessage('Username is required'),
+], handleValidationErrors, asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { username, email, password, role, is_active } = req.body;
+  
+  const [existing] = await pool.execute('SELECT id FROM users WHERE id = ?', [id]);
+  if (existing.length === 0) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+  
+  // Check if username already exists for other users
+  const [usernameExists] = await pool.execute('SELECT id FROM users WHERE username = ? AND id != ?', [username, id]);
+  if (usernameExists.length > 0) {
+    return res.status(400).json({ success: false, message: 'Username already exists' });
+  }
+  
+  let updateFields = ['username = ?', 'email = ?', 'role = ?', 'is_active = ?'];
+  let updateValues = [username, email, role, is_active !== false];
+  
+  if (password && password.trim() !== '') {
+    const bcrypt = require('bcrypt');
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updateFields.push('password = ?');
+    updateValues.push(hashedPassword);
+  }
+  
+  updateValues.push(id);
+  
+  const sql = `UPDATE users SET ${updateFields.join(', ')} WHERE id = ?`;
+  await pool.execute(sql, updateValues);
+  
+  res.json({ success: true, message: 'User updated successfully' });
+}));
+
+app.delete('/api/users/:id', asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  const [existing] = await pool.execute('SELECT id FROM users WHERE id = ?', [id]);
+  if (existing.length === 0) {
+    return res.status(404).json({ success: false, message: 'User not found' });
+  }
+  
+  await pool.execute('DELETE FROM users WHERE id = ?', [id]);
+  
+  res.json({ success: true, message: 'User deleted successfully' });
 }));
 
 app.use((error, req, res, next) => {
