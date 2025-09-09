@@ -159,9 +159,9 @@ app.get('/api/images/:filename', (req, res) => {
 });
 
 app.get('/api/videos', asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
+const page = parseInt(req.query.page, 10) || 1;
+const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
+const offset = (page - 1) * limit;
   const category = req.query.category;
   const search = req.query.search;
 
@@ -185,8 +185,8 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
     countParams.push(searchParam, searchParam);
   }
 
-  sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
-  params.push(limit, offset);
+sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
+params.push(Number(limit), Number(offset));
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);
@@ -206,7 +206,7 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
 
   const [videos] = await pool.execute(
     'SELECT * FROM videos WHERE category = ? ORDER BY id ASC LIMIT ? OFFSET ?',
-    [category, limit, offset]
+    [category, Number(limit), Number(offset)]
   );
 
   const [countResult] = await pool.execute('SELECT COUNT(*) as total FROM videos WHERE category = ?', [category]);
@@ -219,14 +219,20 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
 }));
 
 app.get('/api/videos/featured', asyncHandler(async (req, res) => {
-  const limit = parseInt(req.query.limit) || 10;
-  const [videos] = await pool.execute('SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ?', [limit]);
+  const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
+  const [videos] = await pool.execute(
+    'SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ?',
+    [Number(limit)]
+  );
   res.json({ success: true, data: videos });
 }));
 
 app.get('/api/videos/recent', asyncHandler(async (req, res) => {
-  const limit = parseInt(req.query.limit) || 5;
-  const [videos] = await pool.execute('SELECT * FROM videos ORDER BY id ASC LIMIT ?', [limit]);
+  const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 5;
+  const [videos] = await pool.execute(
+    'SELECT * FROM videos ORDER BY id ASC LIMIT ?',
+    [Number(limit)]
+  );
   res.json({ success: true, data: videos });
 }));
 
