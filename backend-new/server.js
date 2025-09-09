@@ -20,11 +20,12 @@ app.use(morgan('combined'));
 
 // CORS setup
 const allowedOrigins = [
-  'http://localhost:3000',                        // local dev
-  'https://portfolio-video-editor.onrender.com'   // FE trên Render
+  'http://localhost:3000',
+  'https://portfolio-video-editor.onrender.com'
 ];
 
 // CORS configuration
+
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -37,14 +38,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
-
-
-// app.use(cors({
-//   origin: process.env.FRONTEND_URL || 'http://localhost:3000', 
-//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//   allowedHeaders: ['Content-Type', 'Authorization'],
-//   credentials: true,
-// }));
 
 // Phục vụ file tĩnh từ thư mục uploads với CORS headers
 app.use('/uploads', (req, res, next) => {
