@@ -159,9 +159,9 @@ app.get('/api/images/:filename', (req, res) => {
 });
 
 app.get('/api/videos', asyncHandler(async (req, res) => {
-const page = parseInt(req.query.page, 10) || 1;
-const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
-const offset = (page - 1) * limit;
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
+  const offset = (page - 1) * limit;
   const category = req.query.category;
   const search = req.query.search;
 
@@ -185,8 +185,8 @@ const offset = (page - 1) * limit;
     countParams.push(searchParam, searchParam);
   }
 
-sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
-params.push(Number(limit), Number(offset));
+  sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
+  params.push(Number(limit), Number(offset));
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);
@@ -198,10 +198,11 @@ params.push(Number(limit), Number(offset));
   });
 }));
 
+
 app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
   const { category } = req.params;
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
   const offset = (page - 1) * limit;
 
   const [videos] = await pool.execute(
@@ -217,6 +218,7 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
     data: { videos, category, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
   });
 }));
+
 
 app.get('/api/videos/featured', asyncHandler(async (req, res) => {
   const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
@@ -235,6 +237,7 @@ app.get('/api/videos/recent', asyncHandler(async (req, res) => {
   );
   res.json({ success: true, data: videos });
 }));
+
 
 app.get('/api/videos/search', asyncHandler(async (req, res) => {
   const { q, category, sortBy = 'id', order = 'ASC' } = req.query;
