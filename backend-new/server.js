@@ -159,7 +159,7 @@ app.get('/api/images/:filename', (req, res) => {
 });
 
 app.get('/api/videos', asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page, 10) || 1;
+  const page = Number.isInteger(Number(req.query.page)) ? Number(req.query.page) : 1;
   const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
   const offset = (page - 1) * limit;
   const category = req.query.category;
@@ -186,7 +186,7 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
   }
 
   sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
-  params.push(Number(limit), Number(offset));
+  params.push(limit, offset);
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);
@@ -198,16 +198,15 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
   });
 }));
 
-
 app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
   const { category } = req.params;
-  const page = parseInt(req.query.page, 10) || 1;
+  const page = Number.isInteger(Number(req.query.page)) ? Number(req.query.page) : 1;
   const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
   const offset = (page - 1) * limit;
 
   const [videos] = await pool.execute(
     'SELECT * FROM videos WHERE category = ? ORDER BY id ASC LIMIT ? OFFSET ?',
-    [category, Number(limit), Number(offset)]
+    [category, limit, offset]
   );
 
   const [countResult] = await pool.execute('SELECT COUNT(*) as total FROM videos WHERE category = ?', [category]);
@@ -219,12 +218,11 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
   });
 }));
 
-
 app.get('/api/videos/featured', asyncHandler(async (req, res) => {
   const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 10;
   const [videos] = await pool.execute(
     'SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ?',
-    [Number(limit)]
+    [limit]
   );
   res.json({ success: true, data: videos });
 }));
@@ -233,11 +231,10 @@ app.get('/api/videos/recent', asyncHandler(async (req, res) => {
   const limit = Number.isInteger(Number(req.query.limit)) ? Number(req.query.limit) : 5;
   const [videos] = await pool.execute(
     'SELECT * FROM videos ORDER BY id ASC LIMIT ?',
-    [Number(limit)]
+    [limit]
   );
   res.json({ success: true, data: videos });
 }));
-
 
 app.get('/api/videos/search', asyncHandler(async (req, res) => {
   const { q, category, sortBy = 'id', order = 'ASC' } = req.query;
