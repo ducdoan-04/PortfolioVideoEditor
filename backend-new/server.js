@@ -186,8 +186,8 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
     countParams.push(searchParam, searchParam);
   }
 
-  sql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
-  params.push(Number(limit), Number(offset));
+  // ⚠️ fix LIMIT/OFFSET
+  sql += ` ORDER BY id ASC LIMIT ${limit} OFFSET ${offset}`;
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);
@@ -195,10 +195,7 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: {
-      videos,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
-    },
+    data: { videos, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
   });
 }));
 
@@ -209,10 +206,8 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
   const offset = (page - 1) * limit;
 
-  const [videos] = await pool.execute(
-    'SELECT * FROM videos WHERE category = ? ORDER BY id ASC LIMIT ? OFFSET ?',
-    [category, Number(limit), Number(offset)]
-  );
+  const sql = `SELECT * FROM videos WHERE category = ? ORDER BY id ASC LIMIT ${limit} OFFSET ${offset}`;
+  const [videos] = await pool.execute(sql, [category]);
 
   const [countResult] = await pool.execute(
     'SELECT COUNT(*) as total FROM videos WHERE category = ?',
@@ -222,31 +217,23 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: {
-      videos,
-      category,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
-    },
+    data: { videos, category, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
   });
 }));
 
 // Featured videos (by views & likes)
 app.get('/api/videos/featured', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
-  const [videos] = await pool.execute(
-    'SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ?',
-    [Number(limit)]
-  );
+  const sql = `SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ${limit}`;
+  const [videos] = await pool.execute(sql);
   res.json({ success: true, data: videos });
 }));
 
 // Recent videos
 app.get('/api/videos/recent', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 5;
-  const [videos] = await pool.execute(
-    'SELECT * FROM videos ORDER BY id DESC LIMIT ?',
-    [Number(limit)]
-  );
+  const sql = `SELECT * FROM videos ORDER BY id DESC LIMIT ${limit}`;
+  const [videos] = await pool.execute(sql);
   res.json({ success: true, data: videos });
 }));
 
@@ -281,8 +268,8 @@ app.get('/api/videos/search', asyncHandler(async (req, res) => {
   const sortField = allowedSortFields.includes(sortBy) ? sortBy : 'id';
   const sortOrder = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
-  sql += ` ORDER BY ${sortField} ${sortOrder} LIMIT ? OFFSET ?`;
-  params.push(Number(limit), Number(offset));
+  // ⚠️ fix LIMIT/OFFSET
+  sql += ` ORDER BY ${sortField} ${sortOrder} LIMIT ${limit} OFFSET ${offset}`;
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);
@@ -290,12 +277,7 @@ app.get('/api/videos/search', asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    data: {
-      videos,
-      searchQuery: q,
-      category,
-      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
-    },
+    data: { videos, searchQuery: q, category, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } },
   });
 }));
 
