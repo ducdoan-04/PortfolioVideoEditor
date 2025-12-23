@@ -154,6 +154,7 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
   const offset = (page - 1) * limit;
   const category = req.query.category;
   const search = req.query.search;
+  const all = req.query.all === 'true'; // New parameter for admin
 
   let sql = 'SELECT * FROM videos WHERE 1=1';
   let countSql = 'SELECT COUNT(*) as total FROM videos WHERE 1=1';
@@ -175,8 +176,12 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
     countParams.push(searchParam, searchParam);
   }
 
-  // ⚠️ fix LIMIT/OFFSET
-  sql += ` ORDER BY id ASC LIMIT ${limit} OFFSET ${offset}`;
+  // If all=true, don't apply LIMIT/OFFSET for admin
+  if (!all) {
+    sql += ` ORDER BY id ASC LIMIT ${limit} OFFSET ${offset}`;
+  } else {
+    sql += ' ORDER BY id ASC';
+  }
 
   const [videos] = await pool.execute(sql, params);
   const [countResult] = await pool.execute(countSql, countParams);

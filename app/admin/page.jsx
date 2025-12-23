@@ -103,7 +103,7 @@ export default function AdminPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
       const [videosRes, categoriesRes, usersRes] = await Promise.all([
-        fetch(`${apiUrl}/api/videos`),
+        fetch(`${apiUrl}/api/videos?all=true`),
         fetch(`${apiUrl}/api/categories`),
         fetch(`${apiUrl}/api/users`)
       ])
