@@ -9,6 +9,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { body, validationResult } = require('express-validator');
+const { uploadToCloudinary } = require('./cloudinary-upload');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -59,14 +60,8 @@ if (!fs.existsSync(uploadsDir)) {
   console.log(`📁 Đã tạo thư mục uploads tại: ${uploadsDir}`);
 }
 
-// Cấu hình multer cho upload file
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  },
-});
+// Cấu hình multer cho upload file - Sử dụng memory storage thay vì disk storage
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('video/') || file.mimetype.startsWith('image/')) {
@@ -149,25 +144,6 @@ app.get('/api/test-uploads', (req, res) => {
       error: error.message 
     });
   }
-});
-
-// API endpoint để serve images
-app.get('/api/images/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const imagePath = path.join(__dirname, 'uploads', filename);
-  
-  // Kiểm tra file có tồn tại không
-  if (!fs.existsSync(imagePath)) {
-    return res.status(404).json({ success: false, message: 'Image not found' });
-  }
-  
-  // Set headers
-  res.setHeader('Content-Type', 'image/png');
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Cache-Control', 'public, max-age=31536000');
-  
-  // Send file
-  res.sendFile(imagePath);
 });
 
 // Get all videos with pagination, search, filter
@@ -392,7 +368,19 @@ app.post('/api/videos', upload.single('thumbnail'), asyncHandler(async (req, res
 
   let thumbnail_url = null;
   if (req.file) {
-    thumbnail_url = `/uploads/${req.file.filename}`;
+    try {
+      // Upload thumbnail to Cloudinary
+      const cloudinaryResult = await uploadToCloudinary(req.file.buffer, `thumbnail-${Date.now()}`, 'image');
+      thumbnail_url = cloudinaryResult.secure_url;
+      console.log('✅ Cloudinary Upload Success:', {
+        public_id: cloudinaryResult.public_id,
+        secure_url: cloudinaryResult.secure_url,
+        resource_type: cloudinaryResult.resource_type
+      });
+    } catch (error) {
+      console.error('Thumbnail upload error:', error);
+      return res.status(500).json({ success: false, message: 'Lỗi upload thumbnail: ' + error.message });
+    }
   }
 
   const [result] = await pool.execute(
@@ -419,7 +407,14 @@ app.put('/api/videos/:id', upload.single('thumbnail'), asyncHandler(async (req, 
 
   let thumbnail_url = null;
   if (req.file) {
-    thumbnail_url = `/uploads/${req.file.filename}`;
+    try {
+      // Upload thumbnail to Cloudinary
+      const cloudinaryResult = await uploadToCloudinary(req.file.buffer, `thumbnail-${Date.now()}`, 'image');
+      thumbnail_url = cloudinaryResult.secure_url;
+    } catch (error) {
+      console.error('Thumbnail upload error:', error);
+      return res.status(500).json({ success: false, message: 'Lỗi upload thumbnail: ' + error.message });
+    }
   }
 
   const updateFields = [];
@@ -479,12 +474,30 @@ app.delete('/api/videos', asyncHandler(async (req, res) => {
 
 app.post('/api/upload', upload.single('file'), asyncHandler(async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: 'Không có file nào được upload' });
-  const fileUrl = `/uploads/${req.file.filename}`;
-  res.json({
-    success: true,
-    message: 'Upload file thành công',
-    data: { filename: req.file.filename, originalname: req.file.originalname, size: req.file.size, url: fileUrl },
-  });
+  
+  try {
+    // Determine resource type based on mimetype
+    const resourceType = req.file.mimetype.startsWith('video/') ? 'video' : 'image';
+    
+    // Upload to Cloudinary
+    const result = await uploadToCloudinary(req.file.buffer, req.file.originalname, resourceType);
+    
+    res.json({
+      success: true,
+      message: 'Upload file thành công',
+      data: { 
+        filename: result.public_id, 
+        originalname: req.file.originalname, 
+        size: req.file.size, 
+        url: result.secure_url,
+        cloudinaryId: result.public_id,
+        resourceType: result.resource_type,
+      },
+    });
+  } catch (error) {
+    console.error('Upload error:', error);
+    res.status(500).json({ success: false, message: 'Lỗi upload file: ' + error.message });
+  }
 }));
 
 // Admin Login

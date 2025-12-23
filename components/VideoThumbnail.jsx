@@ -3,28 +3,30 @@ import { Video } from 'lucide-react';
 
 export default function VideoThumbnail({ video, className = "w-full h-full object-cover" }) {
   const [imageError, setImageError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState(0);
 
-  // Danh sách các URL để thử
-  const getImageUrls = (thumbnailUrl) => {
-    if (!thumbnailUrl) return [];
+  // Nếu thumbnail_url là URL Cloudinary (hoặc đầy đủ), dùng trực tiếp
+  // Nếu là đường dẫn cũ từ /uploads, thử nhiều URL
+  const getThumbnailUrl = (thumbnailUrl) => {
+    if (!thumbnailUrl) return null;
     
+    // Nếu là URL Cloudinary (bắt đầu với https://res.cloudinary.com), dùng trực tiếp
+    if (thumbnailUrl.startsWith('https://res.cloudinary.com')) {
+      return thumbnailUrl;
+    }
+    
+    // Nếu là URL đầy đủ (http/https), dùng trực tiếp
+    if (thumbnailUrl.startsWith('http')) {
+      return thumbnailUrl;
+    }
+    
+    // Nếu là đường dẫn tương đối cũ, thử qua backend
     const filename = thumbnailUrl.split('/').pop();
-    return [
-      // Next.js API route
-      `/api/images/${filename}`,
-      // Backend API endpoint
-      `http://localhost:3001/api/images/${filename}`,
-      // Direct uploads path
-      `http://localhost:3001${thumbnailUrl}`,
-      // Public path (nếu có)
-      thumbnailUrl.startsWith('/backgroundVideo/') ? thumbnailUrl : null,
-    ].filter(Boolean);
+    return `http://localhost:3001${thumbnailUrl}`;
   };
 
-  const urls = getImageUrls(video.thumbnail_url);
+  const thumbnailUrl = getThumbnailUrl(video.thumbnail_url);
   
-  if (!video.thumbnail_url || imageError) {
+  if (!thumbnailUrl || imageError) {
     return (
       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
         <div className="text-center">
@@ -36,16 +38,12 @@ export default function VideoThumbnail({ video, className = "w-full h-full objec
   }
 
   const handleError = () => {
-    if (currentSrc < urls.length - 1) {
-      setCurrentSrc(currentSrc + 1);
-    } else {
-      setImageError(true);
-    }
+    setImageError(true);
   };
 
   return (
     <img 
-      src={urls[currentSrc]}
+      src={thumbnailUrl}
       alt={video.title}
       className={className}
       onError={handleError}
