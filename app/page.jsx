@@ -252,7 +252,7 @@ export default function VideoEditorPortfolio() {
               <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-8 md:mt-0">HO DUC DOAN</h1>
               <p className="text-gray-500 font-medium text-lg mb-2">Hi there!</p>
               <p className="text-gray-600 leading-relaxed mb-6 max-w-lg">
-                I'm Doan a passionate video editor with 4 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
+                I'm Doan a passionate video editor with 3 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
               </p>
 
               <div className="space-y-3 mb-8">
@@ -267,7 +267,7 @@ export default function VideoEditorPortfolio() {
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <span className="font-semibold text-gray-800">Photo Editing Tools:</span>
-                    <span className="text-gray-600 ml-1">Photoshop, Illustrator</span>
+                    <span className="text-gray-600 ml-1">Photoshop, Illustrator, Evoto</span>
                   </div>
                 </div>
               </div>
@@ -289,7 +289,7 @@ export default function VideoEditorPortfolio() {
                 <Rocket className="w-8 h-8 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-black">4 years</div>
+                <div className="text-2xl font-bold text-black">3 years</div>
                 <div className="text-gray-600 text-sm">Work Experience</div>
               </div>
             </div>
@@ -298,8 +298,8 @@ export default function VideoEditorPortfolio() {
                 <CheckCircle className="w-8 h-8 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-black">95%</div>
-                <div className="text-gray-600 text-sm">Employers Satisfaction</div>
+                <div className="text-2xl font-bold text-black">99%</div>
+                <div className="text-gray-600 text-sm">Customer Satisfaction</div>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -307,8 +307,8 @@ export default function VideoEditorPortfolio() {
                 <Building className="w-8 h-8 text-white" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-black">5.5</div>
-                <div className="text-gray-600 text-sm">IELTS</div>
+                <div className="text-2xl font-bold text-black">600+</div>
+                <div className="text-gray-600 text-sm">TOEIC</div>
               </div>
             </div>
           </div>
