@@ -1,4 +1,5 @@
-require('dotenv').config();
+// require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env.local') });
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
@@ -82,12 +83,20 @@ const upload = multer({
 });
 
 // Kết nối MySQL
+console.log('🔧 Database Configuration:');
+console.log('  Host:', process.env.DB_HOST);
+console.log('  Port:', process.env.DB_PORT);
+console.log('  User:', process.env.DB_USER);
+console.log('  Database:', process.env.DB_NAME);
+console.log('  SSL:', process.env.DB_SSL);
+
 const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'video_db',
-  port: process.env.DB_PORT || 3306,
+  port: parseInt(process.env.DB_PORT) || 3306,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
@@ -96,11 +105,14 @@ const pool = mysql.createPool({
 // Test connection
 async function testConnection() {
   try {
+    console.log('📡 Đang kết nối tới MySQL...');
     const connection = await pool.getConnection();
     console.log('✅ Đã kết nối MySQL thành công');
     connection.release();
   } catch (err) {
-    console.error('❌ Lỗi kết nối MySQL:', err.message);
+    console.error('❌ Lỗi kết nối MySQL:', err);
+    console.error('Error Code:', err.code);
+    console.error('Error Message:', err.message);
     process.exit(1);
   }
 }
