@@ -94,8 +94,10 @@ export default function VideoEditorPortfolio() {
         if (videosData.success) {
           console.log('Videos fetched:', videosData.data.videos.length);
           setCurrentData(videosData.data.videos.map(video => {
-            const thumbnailUrl = video.thumbnail_url 
-              ? `${apiUrl}${video.thumbnail_url}`
+            const thumbnailUrl = video.thumbnail_url
+              ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
+                  ? video.thumbnail_url
+                  : `${apiUrl}${video.thumbnail_url}`)
               : "/backgroundVideo/1.jpg";
             console.log('Video thumbnail URL:', thumbnailUrl);
             return {
@@ -111,8 +113,10 @@ export default function VideoEditorPortfolio() {
         if (recentData.success) {
           setRecentProjects(recentData.data.map(video => ({
             ...video,
-            thumbnail: video.thumbnail_url 
-              ? `${apiUrl}${video.thumbnail_url}`
+            thumbnail: video.thumbnail_url
+              ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
+                  ? video.thumbnail_url
+                  : `${apiUrl}${video.thumbnail_url}`)
               : "/backgroundVideo/1.jpg",
             views: video.views ? `${video.views}K` : "N/A",
             date: video.created_at ? new Date(video.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
@@ -138,8 +142,10 @@ export default function VideoEditorPortfolio() {
       if (data.success) {
         setCurrentData(data.data.videos.map(video => ({
           ...video,
-          thumbnail: video.thumbnail_url 
-            ? `${apiUrl}${video.thumbnail_url}`
+          thumbnail: video.thumbnail_url
+            ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
+                ? video.thumbnail_url
+                : `${apiUrl}${video.thumbnail_url}`)
             : "/backgroundVideo/1.jpg",
           duration: video.duration || "N/A",
         })));
