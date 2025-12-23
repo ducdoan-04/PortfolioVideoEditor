@@ -178,9 +178,9 @@ app.get('/api/videos', asyncHandler(async (req, res) => {
 
   // If all=true, don't apply LIMIT/OFFSET for admin
   if (!all) {
-    sql += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    sql += ` ORDER BY updated_at DESC LIMIT ${limit} OFFSET ${offset}`;
   } else {
-    sql += ' ORDER BY created_at DESC';
+    sql += ' ORDER BY updated_at DESC';
   }
 
   const [videos] = await pool.execute(sql, params);
@@ -200,7 +200,7 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
   const offset = (page - 1) * limit;
 
-  const sql = `SELECT * FROM videos WHERE category = ? ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+  const sql = `SELECT * FROM videos WHERE category = ? ORDER BY updated_at DESC LIMIT ${limit} OFFSET ${offset}`;
   const [videos] = await pool.execute(sql, [category]);
 
   const [countResult] = await pool.execute(
@@ -218,7 +218,7 @@ app.get('/api/videos/category/:category', asyncHandler(async (req, res) => {
 // Featured videos (by views & likes)
 app.get('/api/videos/featured', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 10;
-  const sql = `SELECT * FROM videos ORDER BY views DESC, likes DESC, id ASC LIMIT ${limit}`;
+  const sql = `SELECT * FROM videos ORDER BY views DESC, likes DESC, updated_at DESC LIMIT ${limit}`;
   const [videos] = await pool.execute(sql);
   res.json({ success: true, data: videos });
 }));
@@ -226,7 +226,7 @@ app.get('/api/videos/featured', asyncHandler(async (req, res) => {
 // Recent videos
 app.get('/api/videos/recent', asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 5;
-  const sql = `SELECT * FROM videos ORDER BY created_at DESC LIMIT ${limit}`;
+  const sql = `SELECT * FROM videos ORDER BY updated_at DESC LIMIT ${limit}`;
   const [videos] = await pool.execute(sql);
   res.json({ success: true, data: videos });
 }));
