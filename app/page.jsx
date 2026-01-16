@@ -493,7 +493,7 @@ export default function VideoEditorPortfolio() {
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
               <Phone className="w-5 h-5 text-blue-600" />
-              <span className="text-gray-700 font-medium">+84919261772</span>
+              <span className="text-gray-700 font-medium">(+84) 919261712</span>
             </div>
             <div className="flex items-center justify-center gap-3">
               <Mail className="w-5 h-5 text-red-600" />

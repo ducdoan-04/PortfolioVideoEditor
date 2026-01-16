@@ -24,7 +24,8 @@ app.use(morgan('combined'));
 const allowedOrigins = [
   'http://localhost:3000',
   'https://portfolio-video-editor.onrender.com',
-  'https://portfolio-video-editor.vercel.app'
+  'https://portfolio-video-editor.vercel.app',
+  'https://ducdoan04-editor.vercel.app/'
 ];
 
 // CORS configuration
