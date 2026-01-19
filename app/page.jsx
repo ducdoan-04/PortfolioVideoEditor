@@ -169,8 +169,37 @@ export default function VideoEditorPortfolio() {
     window.location.href = '/admin'
   }
 
-  if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center">Loading...</div>
+  if (loading) return 
+                      <div>
+                          <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+                            <div className="relative">
 
+                              {/* Chat bubble */}
+                              <div className="absolute -top-6 left-1/3 translate-x-8">
+                                <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
+                                  <p className="text-gray-700 text-base font-medium whitespace-nowrap">
+                                    Please wait a moment<span className="animate-pulse">...</span>
+                                  </p>  
+
+                                  {/* Tail */}
+                                  <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45"></div>
+                                </div>
+                              </div>
+
+                              {/* Avatar */}
+                              <div className="w-50 h-52 rounded-full bg-blue-500  flex items-center justify-center overflow-hidden">
+                                <Image
+                                  src="/images/loding-gif.gif"
+                                  alt="Loading"
+                                  width={400}
+                                  height={400}
+                                  className="w-full h-full object-contain"
+                                />
+                              </div>
+
+                            </div>
+                        </div>
+                      </div>;
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Page Title */}
@@ -234,7 +263,7 @@ export default function VideoEditorPortfolio() {
 
               <div className="mt-8 z-10">
                 <div className="bg-white rounded-2xl px-8 py-4 shadow-lg flex gap-6 items-center">
-                  <a href="https://www.facebook.com/doan.12.02.04" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" aria-label="Facebook">
+                  <a href="https://www.facebook.com/ducdoan.24" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" aria-label="Facebook">
                     <Facebook className="w-6 h-6 text-white" />
                   </a>
                   <a href="https://www.instagram.com/ducdoan.04/" className="w-12 h-12 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" aria-label="Instagram">
@@ -487,9 +516,9 @@ export default function VideoEditorPortfolio() {
         {/* Contact Section */}
         <div className="bg-white px-8 py-16 text-center">
           <h2 className="text-2xl font-bold text-black mb-6">You love my products???</h2>
-          <Button className="bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-full font-medium text-lg mb-8">
-            Contact me now
-          </Button>
+          <a href="mailto:ducdoan04.work@gmail.com" className="text-blue-500 hover:underline">
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-full font-medium text-lg mb-8">Contact me now</Button>
+          </a>
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
               <Phone className="w-5 h-5 text-blue-600" />
