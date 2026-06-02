@@ -276,13 +276,13 @@ export default function VideoEditorPortfolio() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-16">
             {/* Left Side - Profile Image and Socials */}
             <div className="relative flex flex-col items-center">
-              <a href="tel:+84919261712" className="absolute -top-0 md:mt-6 -left-0 flex items-center gap-2 z-20">
+              <a href={`tel:${profile?.phone || '+84919261712'}`} className="absolute -top-0 md:mt-6 -left-0 flex items-center gap-2 z-20">
                 <div className="w-11 h-11 bg-white shadow-md rounded-xl flex items-center justify-center">
                   <Phone className="w-6 h-6 text-blue-500" />
                 </div>
                 <span className="text-gray-600 text-sm font-medium" style={{ display: "none" }}>+84919261712</span>
               </a>
-              <a href="mailto:ho.duc.doan@gmail.com" className="absolute -top-0 md:mt-5 right-0 md:mb-4 flex justify-end md:justify-start z-20">
+              <a href={`mailto:${profile?.email || 'ducdoan04.work@gmail.com'}`} className="absolute -top-0 md:mt-5 right-0 md:mb-4 flex justify-end md:justify-start z-20">
                 <div className="w-12 h-12 bg-white shadow-md rounded-xl flex items-center justify-center">
                   <Mail className="w-7 h-7 text-red-500" />
                 </div>

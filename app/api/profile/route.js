@@ -60,7 +60,9 @@ export async function PUT(request) {
         facebook_url: formData.get('facebook_url'),
         instagram_url: formData.get('instagram_url'),
         zalo_url: formData.get('zalo_url'),
-        avatar_url: formData.get('avatar_url')
+        avatar_url: formData.get('avatar_url'),
+        email: formData.get('email'),
+        phone: formData.get('phone')
       };
     } else {
       updateData = await request.json();

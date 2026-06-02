@@ -25,6 +25,8 @@ export default function ProfileManagement() {
     experience_years: 0,
     satisfaction_rate: 0,
     toeic_score: 0,
+    email: "",
+    phone: "",
     facebook_url: "",
     instagram_url: "",
     zalo_url: "",
@@ -155,8 +157,18 @@ export default function ProfileManagement() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-semibold text-lg text-gray-700">Mạng xã hội</h3>
-              
+              <h3 className="font-semibold text-lg text-gray-700">Liên hệ & Mạng xã hội</h3>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={formData.email || ""} onChange={handleInputChange} placeholder="ducdoan04.work@gmail.com" />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Số điện thoại</Label>
+                <Input id="phone" type="tel" value={formData.phone || ""} onChange={handleInputChange} placeholder="+84919261712" />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="facebook_url">Facebook Link</Label>
                 <Input id="facebook_url" value={formData.facebook_url || ""} onChange={handleInputChange} />
