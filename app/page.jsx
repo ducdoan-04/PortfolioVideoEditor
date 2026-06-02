@@ -12,6 +12,7 @@ import apiService from '@/lib/api'
 const t = {
   EN: {
     wait: "Please wait a moment...",
+    myName: "HO DUC DOAN",
     videoTools: "Video Editing Tools:",
     photoTools: "Photo Editing Tools:",
     contact: "Contact me now",
@@ -31,6 +32,7 @@ const t = {
   },
   VIE: {
     wait: "Vui lòng đợi một lát...",
+    myName: "HỒ ĐỨC ĐOAN",
     videoTools: "Công cụ chỉnh sửa Video:",
     photoTools: "Công cụ chỉnh sửa Ảnh:",
     contact: "Liên hệ tôi ngay",
@@ -327,7 +329,7 @@ export default function VideoEditorPortfolio() {
 
             {/* Right Side - Content */}
             <div className="flex-1 w-full md:w-auto pt-0 md:pt-4 relative">
-              <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-1 md:mt-0">{profile?.name || "HO DUC DOAN"}</h1>
+              <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-1 md:mt-0">{t[lang].myName || profile?.name || "HO DUC DOAN"}</h1>
               <p className="text-gray-500 font-medium text-lg mb-2">
                 {(lang === 'VIE' && profile?.greeting_vi) ? profile.greeting_vi : (profile?.greeting || "Hi there!")}
               </p>
