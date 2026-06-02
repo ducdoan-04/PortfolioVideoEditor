@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
@@ -27,3 +28,4 @@ export async function GET(request) {
     return NextResponse.json({ success: false, message: 'Lỗi server' }, { status: 500 });
   }
 }
+
