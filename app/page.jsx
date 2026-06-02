@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X, User, Send } from 'lucide-react'
+import apiService from '@/lib/api'
 
 // Video Modal Component
 function VideoModal({ isOpen, onClose, videoId, title, software, description }) {
@@ -67,10 +68,7 @@ export default function VideoEditorPortfolio() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-        
-        const categoriesResp = await fetch(`${apiUrl}/api/categories`);
-        const categoriesData = await categoriesResp.json();
+        const categoriesData = await apiService.getCategories();
         if (categoriesData.success) {
           const mappedCategories = categoriesData.data.map(cat => ({
             id: cat.id,
@@ -81,45 +79,29 @@ export default function VideoEditorPortfolio() {
             active: cat.id === 1,
           }));
           setCategories(mappedCategories);
-          
-          // Set default category to first category
+
           if (mappedCategories.length > 0) {
             setActiveCategory(mappedCategories[0].id);
-            console.log('Setting default category:', mappedCategories[0].name, mappedCategories[0].id);
           }
         }
 
-        const videosResp = await fetch(`${apiUrl}/api/videos?category=${encodeURIComponent(categoriesData.success && categoriesData.data.length > 0 ? categoriesData.data[0].name : '')}`);
-        const videosData = await videosResp.json();
+        const initialCategory = categoriesData.success && categoriesData.data.length > 0 ? categoriesData.data[0].name : '';
+        const videosData = await apiService.getVideosByCategory(initialCategory);
         if (videosData.success) {
-          console.log('Videos fetched:', videosData.data.videos.length);
-          setCurrentData(videosData.data.videos.map(video => {
-            const thumbnailUrl = video.thumbnail_url
-              ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
-                  ? video.thumbnail_url
-                  : `${apiUrl}${video.thumbnail_url}`)
-              : "/backgroundVideo/1.jpg";
-            console.log('Video thumbnail URL:', thumbnailUrl);
-            return {
-              ...video,
-              thumbnail: thumbnailUrl,
-              duration: video.duration || "N/A",
-            };
-          }));
+          setCurrentData(videosData.data.videos.map(video => ({
+            ...video,
+            thumbnail: video.thumbnail || "/backgroundVideo/1.jpg",
+            duration: video.duration || "N/A",
+          })));
         }
 
-        const recentResp = await fetch(`${apiUrl}/api/videos/recent?limit=2`);
-        const recentData = await recentResp.json();
+        const recentData = await apiService.getRecentVideos(2);
         if (recentData.success) {
           setRecentProjects(recentData.data.map(video => ({
             ...video,
-            thumbnail: video.thumbnail_url
-              ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
-                  ? video.thumbnail_url
-                  : `${apiUrl}${video.thumbnail_url}`)
-              : "/backgroundVideo/1.jpg",
+            thumbnail: video.thumbnail || "/backgroundVideo/1.jpg",
             views: video.views ? `${video.views}K` : "N/A",
-            date: video.created_at ? new Date(video.created_at).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A",
+            date: video.date || "N/A",
           })));
         }
       } catch (error) {
@@ -136,17 +118,12 @@ export default function VideoEditorPortfolio() {
     setActiveCategory(categoryId);
     setVideosLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
-      const resp = await fetch(`${apiUrl}/api/videos?category=${encodeURIComponent(categories.find(cat => cat.id === categoryId)?.name || '')}`);
-      const data = await resp.json();
+      const categoryName = categories.find(cat => cat.id === categoryId)?.name || '';
+      const data = await apiService.getVideosByCategory(categoryName);
       if (data.success) {
         setCurrentData(data.data.videos.map(video => ({
           ...video,
-          thumbnail: video.thumbnail_url
-            ? (video.thumbnail_url.startsWith('http://') || video.thumbnail_url.startsWith('https://')
-                ? video.thumbnail_url
-                : `${apiUrl}${video.thumbnail_url}`)
-            : "/backgroundVideo/1.jpg",
+          thumbnail: video.thumbnail || "/backgroundVideo/1.jpg",
           duration: video.duration || "N/A",
         })));
       }
@@ -170,42 +147,42 @@ export default function VideoEditorPortfolio() {
   }
 
   if (loading) return (
-        <div>
-          <div className="min-h-screen bg-gray-200 flex items-center justify-center">
-              <div className="relative">
+    <div>
+      <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+        <div className="relative">
 
-                {/* Chat bubble */}
-                <div className="absolute -top-6 left-1/3 translate-x-8">
-                  <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
-                    <p className="text-gray-700 text-base font-medium whitespace-nowrap">
-                      Please wait a moment<span className="animate-pulse">...</span>
-                    </p>  
+          {/* Chat bubble */}
+          <div className="absolute -top-6 left-1/3 translate-x-8">
+            <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
+              <p className="text-gray-700 text-base font-medium whitespace-nowrap">
+                Please wait a moment<span className="animate-pulse">...</span>
+              </p>
 
-                    {/* Tail */}
-                    <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45"></div>
-                  </div>
-                </div>
-
-                {/* Avatar */}
-                <div className="w-50 h-52 rounded-full bg-blue-500  flex items-center justify-center overflow-hidden">
-                  <Image
-                    src="/images/loding-gif.gif"
-                    alt="Loading"
-                    width={400}
-                    height={400}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-
-              </div>
+              {/* Tail */}
+              <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45"></div>
+            </div>
           </div>
+
+          {/* Avatar */}
+          <div className="w-50 h-52 rounded-full bg-blue-500  flex items-center justify-center overflow-hidden">
+            <Image
+              src="/images/loding-gif.gif"
+              alt="Loading"
+              width={400}
+              height={400}
+              className="w-full h-full object-contain"
+            />
+          </div>
+
         </div>
-    );
+      </div>
+    </div>
+  );
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Page Title */}
       <div className="bg-white px-6 py-3 border-b hidden md:block">
-        <div className="max-w-6xl mx-auto flex justify-between items-center" style={{display: "none"}}>
+        <div className="max-w-6xl mx-auto flex justify-between items-center" style={{ display: "none" }}>
           <h1 className="text-gray-400 font-medium">DoanPortfolio (My Fav {"<3"})</h1>
           <div className="flex items-center space-x-4">
             <Button
@@ -250,13 +227,14 @@ export default function VideoEditorPortfolio() {
               <div className="relative z-10">
                 <div className="w-64 h-64">
                   <div className="rounded-full bg-blue-500 mt-2"></div>
-                  <div className="w-60 h-61 overflow-hidden pb-2 mt-2">
+                  <div className="w-60 h-61 overflow-hidden pb-2 mt-2 relative">
                     <Image
-                      src="/images/profile-photo.png"
+                      src="/images/profile-photo-1.png"
                       alt="Ho Duc Doan"
                       width={240}
                       height={240}
                       className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%' }}
                     />
                   </div>
                 </div>
@@ -271,7 +249,7 @@ export default function VideoEditorPortfolio() {
                     <Instagram className="w-6 h-6 text-white" />
                   </a>
                   <a href="https://zalo.me/0919261712" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:scale-105 transition-colors" aria-label="Zalo">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0,256,256" className="w-full h-full" fillRule="nonzero"><g fill="none" fillRule="nonzero" stroke="none" strokeWidth="none" strokeLinecap="butt" strokeLinejoin="none" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none" style={{mixBlendMode: "normal"}}><path transform="scale(5.33333,5.33333)" d="M29,43h-10c-7.732,0 -14,-6.268 -14,-14v-10c0,-5.88471 3.63593,-10.91138 8.78037,-12.98053c0.00188,-0.00182 0.00375,-0.00365 0.00563,-0.00547c1.613,-0.648 3.369,-1.014 5.214,-1.014h10c7.732,0 14,6.268 14,14v10c0,3.014 -0.962,5.799 -2.583,8.084c-0.00623,0.00379 -0.01246,0.00759 -0.0187,0.01137c-2.53574,3.56814 -6.6879,5.90463 -11.3983,5.90463z" fill="#3160ff" stroke="#3160ff" strokeWidth="2" strokeLinejoin="round"></path><g transform="scale(5.33333,5.33333)" stroke="none" strokeWidth="1" strokeLinejoin="miter"><path d="M15,36v-29.173l-1.211,-0.811c-5.149,2.067 -8.789,7.096 -8.789,12.984v10c0,7.732 6.268,14 14,14h10c4.722,0 8.883,-2.348 11.417,-5.931v-1.069z" fill="#2962ff"></path><path d="M29,5h-10c-1.845,0 -3.601,0.366 -5.214,1.014c-3.333,3.236 -5.786,8.514 -5.786,12.986c0,6.771 0.936,10.735 3.712,14.607c0.216,0.301 0.357,0.653 0.376,1.022c0.043,0.835 -0.129,2.365 -1.634,3.742c-0.162,0.148 -0.059,0.419 0.16,0.428c0.942,0.041 2.843,-0.014 4.797,-0.877c0.557,-0.246 1.191,-0.203 1.729,0.083c3.313,1.759 7.193,1.995 10.86,1.995c4.676,0 9.339,-1.04 12.417,-2.916c1.621,-2.285 2.583,-5.07 2.583,-8.084v-10c0,-7.732 -6.268,-14 -14,-14z" fill="#eeeeee"></path><path d="M36.75,27c-2.067,0 -3.75,-1.683 -3.75,-3.75c0,-2.067 1.683,-3.75 3.75,-3.75c2.067,0 3.75,1.683 3.75,3.75c0,2.067 -1.683,3.75 -3.75,3.75zM36.75,21c-1.24,0 -2.25,1.01 -2.25,2.25c0,1.24 1.01,2.25 2.25,2.25c1.24,0 2.25,-1.01 2.25,-2.25c0,-1.24 -1.01,-2.25 -2.25,-2.25z" fill="#2962ff"></path><path d="M31.5,27h-1c-0.276,0 -0.5,-0.224 -0.5,-0.5v-8.5h1.5z" fill="#2962ff"></path><path d="M27,19.75v0.519c-0.629,-0.476 -1.403,-0.769 -2.25,-0.769c-2.067,0 -3.75,1.683 -3.75,3.75c0,2.067 1.683,3.75 3.75,3.75c0.847,0 1.621,-0.293 2.25,-0.769v0.269c0,0.276 0.224,0.5 0.5,0.5h1v-7.25zM24.75,25.5c-1.24,0 -2.25,-1.01 -2.25,-2.25c0,-1.24 1.01,-2.25 2.25,-2.25c1.24,0 2.25,1.01 2.25,2.25c0,1.24 -1.01,2.25 -2.25,2.25z" fill="#2962ff"></path><path d="M21.25,18h-8v1.5h5.321l-5.571,6.5h0.026c-0.163,0.211 -0.276,0.463 -0.276,0.75v0.25h7.5c0.276,0 0.5,-0.224 0.5,-0.5v-1h-5.321l5.571,-6.5h-0.026c0.163,-0.211 0.276,-0.463 0.276,-0.75z" fill="#2962ff"></path></g></g></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0,256,256" className="w-full h-full" fillRule="nonzero"><g fill="none" fillRule="nonzero" stroke="none" strokeWidth="none" strokeLinecap="butt" strokeLinejoin="none" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none" style={{ mixBlendMode: "normal" }}><path transform="scale(5.33333,5.33333)" d="M29,43h-10c-7.732,0 -14,-6.268 -14,-14v-10c0,-5.88471 3.63593,-10.91138 8.78037,-12.98053c0.00188,-0.00182 0.00375,-0.00365 0.00563,-0.00547c1.613,-0.648 3.369,-1.014 5.214,-1.014h10c7.732,0 14,6.268 14,14v10c0,3.014 -0.962,5.799 -2.583,8.084c-0.00623,0.00379 -0.01246,0.00759 -0.0187,0.01137c-2.53574,3.56814 -6.6879,5.90463 -11.3983,5.90463z" fill="#3160ff" stroke="#3160ff" strokeWidth="2" strokeLinejoin="round"></path><g transform="scale(5.33333,5.33333)" stroke="none" strokeWidth="1" strokeLinejoin="miter"><path d="M15,36v-29.173l-1.211,-0.811c-5.149,2.067 -8.789,7.096 -8.789,12.984v10c0,7.732 6.268,14 14,14h10c4.722,0 8.883,-2.348 11.417,-5.931v-1.069z" fill="#2962ff"></path><path d="M29,5h-10c-1.845,0 -3.601,0.366 -5.214,1.014c-3.333,3.236 -5.786,8.514 -5.786,12.986c0,6.771 0.936,10.735 3.712,14.607c0.216,0.301 0.357,0.653 0.376,1.022c0.043,0.835 -0.129,2.365 -1.634,3.742c-0.162,0.148 -0.059,0.419 0.16,0.428c0.942,0.041 2.843,-0.014 4.797,-0.877c0.557,-0.246 1.191,-0.203 1.729,0.083c3.313,1.759 7.193,1.995 10.86,1.995c4.676,0 9.339,-1.04 12.417,-2.916c1.621,-2.285 2.583,-5.07 2.583,-8.084v-10c0,-7.732 -6.268,-14 -14,-14z" fill="#eeeeee"></path><path d="M36.75,27c-2.067,0 -3.75,-1.683 -3.75,-3.75c0,-2.067 1.683,-3.75 3.75,-3.75c2.067,0 3.75,1.683 3.75,3.75c0,2.067 -1.683,3.75 -3.75,3.75zM36.75,21c-1.24,0 -2.25,1.01 -2.25,2.25c0,1.24 1.01,2.25 2.25,2.25c1.24,0 2.25,-1.01 2.25,-2.25c0,-1.24 -1.01,-2.25 -2.25,-2.25z" fill="#2962ff"></path><path d="M31.5,27h-1c-0.276,0 -0.5,-0.224 -0.5,-0.5v-8.5h1.5z" fill="#2962ff"></path><path d="M27,19.75v0.519c-0.629,-0.476 -1.403,-0.769 -2.25,-0.769c-2.067,0 -3.75,1.683 -3.75,3.75c0,2.067 1.683,3.75 3.75,3.75c0.847,0 1.621,-0.293 2.25,-0.769v0.269c0,0.276 0.224,0.5 0.5,0.5h1v-7.25zM24.75,25.5c-1.24,0 -2.25,-1.01 -2.25,-2.25c0,-1.24 1.01,-2.25 2.25,-2.25c1.24,0 2.25,1.01 2.25,2.25c0,1.24 -1.01,2.25 -2.25,2.25z" fill="#2962ff"></path><path d="M21.25,18h-8v1.5h5.321l-5.571,6.5h0.026c-0.163,0.211 -0.276,0.463 -0.276,0.75v0.25h7.5c0.276,0 0.5,-0.224 0.5,-0.5v-1h-5.321l5.571,-6.5h-0.026c0.163,-0.211 0.276,-0.463 0.276,-0.75z" fill="#2962ff"></path></g></g></svg>
                   </a>
                 </div>
               </div>
@@ -359,11 +337,10 @@ export default function VideoEditorPortfolio() {
                   console.log('Category clicked:', category.name, category.id);
                   handleCategoryChange(category.id);
                 }}
-                className={`px-6 py-3 rounded-full font-medium transition-all ${
-                  activeCategory === category.id
+                className={`px-6 py-3 rounded-full font-medium transition-all ${activeCategory === category.id
                     ? "bg-blue-500 text-white hover:bg-blue-600"
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 {category.name}
               </Button>
