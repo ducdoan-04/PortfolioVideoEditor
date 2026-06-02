@@ -327,9 +327,11 @@ export default function VideoEditorPortfolio() {
             {/* Right Side - Content */}
             <div className="flex-1 w-full md:w-auto pt-0 md:pt-4 relative">
               <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-1 md:mt-0">{profile?.name || "HO DUC DOAN"}</h1>
-              <p className="text-gray-500 font-medium text-lg mb-2">{profile?.greeting || "Hi there!"}</p>
+              <p className="text-gray-500 font-medium text-lg mb-2">
+                {(lang === 'VIE' && profile?.greeting_vi) ? profile.greeting_vi : (profile?.greeting || "Hi there!")}
+              </p>
               <p className="text-gray-600 leading-relaxed mb-6 max-w-lg whitespace-pre-line">
-                {profile?.description || "I'm Doan a passionate video editor with 3 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life."}
+                {(lang === 'VIE' && profile?.description_vi) ? profile.description_vi : (profile?.description || "I'm Doan a passionate video editor with 3 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.")}
               </p>
 
               <div className="space-y-3 mb-4 md:mb-8">

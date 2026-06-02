@@ -47,6 +47,7 @@ export async function POST(request) {
       video_id: dataObj.video_id,
       category: dataObj.category,
       software: dataObj.software,
+      extra: dataObj.extra,
       thumbnail_url: thumbnailUrl
     }).select().single();
 

@@ -49,7 +49,9 @@ export async function PUT(request) {
       updateData = {
         name: formData.get('name'),
         greeting: formData.get('greeting'),
+        greeting_vi: formData.get('greeting_vi'),
         description: formData.get('description'),
+        description_vi: formData.get('description_vi'),
         video_tools: formData.get('video_tools'),
         photo_tools: formData.get('photo_tools'),
         experience_years: parseInt(formData.get('experience_years') || 0),

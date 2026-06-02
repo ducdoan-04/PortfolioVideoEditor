@@ -46,6 +46,7 @@ export default function AdminPage() {
     video_id: "",
     software: "",
     category: "",
+    extra: "",
     thumbnail: null
   })
   const [activeTab, setActiveTab] = useState("videos")
@@ -191,6 +192,7 @@ export default function AdminPage() {
           video_id: "",
           software: "",
           category: "",
+          extra: "",
           thumbnail: null
         })
         fetchData()
@@ -291,6 +293,7 @@ export default function AdminPage() {
       video_id: video.video_id,
       software: video.software,
       category: video.category,
+      extra: video.extra || "",
       thumbnail: null // Luôn reset về null khi mở form edit
     })
     setShowEditVideo(true)
@@ -635,6 +638,15 @@ export default function AdminPage() {
               </Select>
             </div>
             <div>
+              <Label htmlFor="extra">Thời lượng (Duration) (Tùy chọn)</Label>
+              <Input
+                id="extra"
+                value={formData.extra}
+                onChange={(e) => setFormData(prev => ({ ...prev, extra: e.target.value }))}
+                placeholder="Ví dụ: 2:00, 4:15"
+              />
+            </div>
+            <div>
               <Label htmlFor="thumbnail">Thumbnail Image</Label>
               <Input
                 id="thumbnail"
@@ -721,6 +733,15 @@ export default function AdminPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label htmlFor="edit-extra">Thời lượng (Duration) (Tùy chọn)</Label>
+              <Input
+                id="edit-extra"
+                value={formData.extra}
+                onChange={(e) => setFormData(prev => ({ ...prev, extra: e.target.value }))}
+                placeholder="Ví dụ: 2:00, 4:15"
+              />
             </div>
             <div>
               <Label htmlFor="edit-thumbnail">Thumbnail Image</Label>

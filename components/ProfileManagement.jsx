@@ -17,7 +17,9 @@ export default function ProfileManagement() {
   const [formData, setFormData] = useState({
     name: "",
     greeting: "",
+    greeting_vi: "",
     description: "",
+    description_vi: "",
     video_tools: "",
     photo_tools: "",
     experience_years: 0,
@@ -92,13 +94,23 @@ export default function ProfileManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="greeting">Lời chào (Greeting)</Label>
+              <Label htmlFor="greeting">Lời chào (Tiếng Anh - Mặc định)</Label>
               <Input id="greeting" value={formData.greeting || ""} onChange={handleInputChange} />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Mô tả bản thân</Label>
+              <Label htmlFor="greeting_vi">Lời chào (Tiếng Việt)</Label>
+              <Input id="greeting_vi" value={formData.greeting_vi || ""} onChange={handleInputChange} placeholder="Ví dụ: Xin chào!" />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Mô tả bản thân (Tiếng Anh - Mặc định)</Label>
               <Textarea id="description" rows={4} value={formData.description || ""} onChange={handleInputChange} />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description_vi">Mô tả bản thân (Tiếng Việt)</Label>
+              <Textarea id="description_vi" rows={4} value={formData.description_vi || ""} onChange={handleInputChange} placeholder="Nhập mô tả tiếng Việt..." />
             </div>
 
             <div className="space-y-2">
