@@ -9,8 +9,46 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Phone, Mail, Facebook, Instagram, Youtube, Rocket, CheckCircle, Building, Play, X, User, Send } from 'lucide-react'
 import apiService from '@/lib/api'
 
+const t = {
+  EN: {
+    wait: "Please wait a moment...",
+    videoTools: "Video Editing Tools:",
+    photoTools: "Photo Editing Tools:",
+    contact: "Contact me now",
+    experience: "Work Experience",
+    satisfaction: "Customer Satisfaction",
+    showcase: "My Portfolio",
+    showcaseDesc: "Have a look on my products, I'm sure you will love it.",
+    recent: "Recent Projects",
+    tools: "Tools:",
+    desc: "Description:",
+    noDesc: "No description available",
+    views: "Views",
+    date: "Date",
+    years: "years"
+  },
+  VIE: {
+    wait: "Vui lòng đợi một lát...",
+    videoTools: "Công cụ chỉnh sửa Video:",
+    photoTools: "Công cụ chỉnh sửa Ảnh:",
+    contact: "Liên hệ tôi ngay",
+    experience: "Kinh nghiệm làm việc",
+    satisfaction: "Khách hàng hài lòng",
+    showcase: "Dự án Nổi bật",
+    showcaseDesc: "Hãy xem qua các sản phẩm của tôi, chắc chắn bạn sẽ thích.",
+    recent: "Dự án Gần đây",
+    tools: "Công cụ:",
+    desc: "Mô tả:",
+    noDesc: "Chưa có mô tả",
+    views: "Lượt xem",
+    date: "Ngày",
+    years: "năm"
+  }
+}
+
+
 // Video Modal Component
-function VideoModal({ isOpen, onClose, videoId, title, software, description }) {
+function VideoModal({ isOpen, onClose, videoId, title, software, description, lang }) {
   if (!isOpen || !videoId) return null
 
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`
@@ -40,8 +78,8 @@ function VideoModal({ isOpen, onClose, videoId, title, software, description }) 
             </div>
           </DialogHeader>
           <div className="block text-sm text-gray-600 mb-4 ml-4">
-            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>Tools:</a> {software || "Capcut Pc, Premiere Pro, After Effects"}</p>
-            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>Description:</a> {description || "No description available"}</p>
+            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>{t[lang].tools}</a> {software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+            <p className="pt-2"><a style={{ textDecoration: "none", color: "black" }}>{t[lang].desc}</a> {description || t[lang].noDesc}</p>
           </div>
         </div>
       </DialogContent>
@@ -64,6 +102,7 @@ export default function VideoEditorPortfolio() {
     software: "",
     description: "",
   })
+  const [lang, setLang] = useState('EN')
 
   // Fetch data from backend
   useEffect(() => {
@@ -161,7 +200,7 @@ export default function VideoEditorPortfolio() {
           <div className="absolute -top-6 left-1/3 translate-x-8">
             <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
               <p className="text-gray-700 text-base font-medium whitespace-nowrap">
-                Please wait a moment<span className="animate-pulse">...</span>
+                {t[lang].wait}<span className="animate-pulse">...</span>
               </p>
 
               {/* Tail */}
@@ -204,6 +243,24 @@ export default function VideoEditorPortfolio() {
               <span className="text-white text-xs font-bold">✓</span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Language Switch */}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-white rounded-full shadow-lg p-1 flex items-center border border-gray-200">
+          <button 
+            onClick={() => setLang('VIE')}
+            className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'VIE' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
+          >
+            VIE
+          </button>
+          <button 
+            onClick={() => setLang('EN')}
+            className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'EN' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
+          >
+            EN
+          </button>
         </div>
       </div>
 
@@ -275,14 +332,14 @@ export default function VideoEditorPortfolio() {
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <span className="font-semibold text-gray-800">Video Editing Tools:</span>
+                    <span className="font-semibold text-gray-800">{t[lang].videoTools}</span>
                     <span className="text-gray-600 ml-1">{profile?.video_tools || "Capcut Pc, Premiere Pro, After Effects"}</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
-                    <span className="font-semibold text-gray-800">Photo Editing Tools:</span>
+                    <span className="font-semibold text-gray-800">{t[lang].photoTools}</span>
                     <span className="text-gray-600 ml-1">{profile?.photo_tools || "Photoshop, Illustrator, Evoto"}</span>
                   </div>
                 </div>
@@ -290,7 +347,7 @@ export default function VideoEditorPortfolio() {
 
               <a href="mailto:ducdoan04.work@gmail.com" className="mb-4 justify-center md:justify-start flex">
                 <Button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-medium text-base">
-                  Contact me now
+                  {t[lang].contact}
                 </Button>
               </a>
             </div>
@@ -305,8 +362,8 @@ export default function VideoEditorPortfolio() {
                 <Rocket className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div className="text-center md:text-left">
-                <div className="text-xl md:text-2xl font-bold text-black">{profile?.experience_years ?? 3} years</div>
-                <div className="text-gray-600 text-xs md:text-sm">Work Experience</div>
+                <div className="text-xl md:text-2xl font-bold text-black">{profile?.experience_years ?? 3} {t[lang].years}</div>
+                <div className="text-gray-600 text-xs md:text-sm">{t[lang].experience}</div>
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4 w-full md:w-auto justify-center md:justify-start">
@@ -315,7 +372,7 @@ export default function VideoEditorPortfolio() {
               </div>
               <div className="text-center md:text-left">
                 <div className="text-xl md:text-2xl font-bold text-black">{profile?.satisfaction_rate ?? 99}%</div>
-                <div className="text-gray-600 text-xs md:text-sm">Customer Satisfaction</div>
+                <div className="text-gray-600 text-xs md:text-sm">{t[lang].satisfaction}</div>
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-center gap-1 md:gap-4 w-full md:w-auto justify-center md:justify-start">
@@ -332,8 +389,8 @@ export default function VideoEditorPortfolio() {
 
         {/* Portfolio Section */}
         <div className="pt-4 pb-1 px-8 py-12 text-center">
-          <h2 className="text-3xl font-bold text-black mb-4">My Portfolio</h2>
-          <p className="text-gray-600 mb-12">Have a look on my products, I'm sure you will love it.</p>
+          <h2 className="text-3xl font-bold text-black mb-4">{t[lang].showcase}</h2>
+          <p className="text-gray-600 mb-12">{t[lang].showcaseDesc}</p>
 
           {/* Category Navigation */}
           <div className="flex justify-center gap-4 flex-wrap mb-12">
@@ -405,8 +462,8 @@ export default function VideoEditorPortfolio() {
                     </div>
                     <div className="p-6">
                       <h3 className="font-bold text-gray-900 mb-2 text-lg">{item.title}</h3>
-                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {item.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
-                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Description:</a> {item.description || "No description available"}</p>
+                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>{t[lang].tools}</a> {item.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+                      <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>{t[lang].desc}</a> {item.description || t[lang].noDesc}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -451,21 +508,17 @@ export default function VideoEditorPortfolio() {
         </div>
 
         {/* Recent Projects Section */}
-        <div className="bg-gray-50 px-8 py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-black mb-4">Recent Projects</h2>
-            <p className="text-gray-600">These are my latest projects, hope you love it.</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="px-8 pb-16">
+          <h2 className="text-3xl font-bold text-black mb-8 text-center">{t[lang].recent}</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {recentProjects.map((project, index) => (
               <Card
                 key={index}
-                className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                className="flex flex-col sm:flex-row overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 onClick={() => openVideoModal(project.video_id, project.title, project.software, project.description)}
               >
-                <CardContent className="p-0">
-                  <div className="relative overflow-hidden rounded-t-lg">
+                <CardContent className="p-0 flex flex-col sm:flex-row w-full">
+                  <div className="relative overflow-hidden sm:w-1/3">
                     <img
                       src={project.thumbnail}
                       alt={project.title}
@@ -526,6 +579,7 @@ export default function VideoEditorPortfolio() {
         title={videoModal.title}
         software={videoModal.software}
         description={videoModal.description}
+        lang={lang}
       />
     </div>
   )
