@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -20,7 +21,12 @@ export async function PUT(request, { params }) {
       dataObj = await request.json();
     }
 
-    const { data, error } = await supabase.from('users').update(dataObj).eq('id', id).select().single();
+    // Hash password nếu có thay đổi
+    if (dataObj.password) {
+      dataObj.password = await bcrypt.hash(dataObj.password, 12);
+    }
+
+    const { data, error } = await supabase.from('users').update(dataObj).eq('id', id).select('id, username, email, role, is_active, created_at').single();
     if (error) throw error;
     return NextResponse.json({ success: true, data });
   } catch (error) {
