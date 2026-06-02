@@ -27,9 +27,9 @@ export default function UserManagement({ users = [], onUsersChange }) {
 
   const handleAddUser = async (e) => {
     e.preventDefault()
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/users`, {
         method: 'POST',
         headers: {
@@ -56,9 +56,9 @@ export default function UserManagement({ users = [], onUsersChange }) {
 
   const handleEditUser = async (e) => {
     e.preventDefault()
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: {
@@ -88,7 +88,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
     if (!confirm('Are you sure you want to delete this user?')) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/users/${userId}`, {
         method: 'DELETE'
       })
@@ -174,7 +174,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
                 </div>
                 <Badge variant="secondary">{user.id}</Badge>
               </div>
-              
+
               <div className="flex gap-2 mb-4">
                 <Badge className={getRoleBadgeColor(user.role)}>
                   <Shield className="w-3 h-3 mr-1" />
@@ -184,7 +184,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
                   {user.is_active ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"

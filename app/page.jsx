@@ -54,6 +54,7 @@ export default function VideoEditorPortfolio() {
   const [currentData, setCurrentData] = useState([])
   const [categories, setCategories] = useState([])
   const [recentProjects, setRecentProjects] = useState([])
+  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [videosLoading, setVideosLoading] = useState(false)
   const [videoModal, setVideoModal] = useState({
@@ -68,6 +69,11 @@ export default function VideoEditorPortfolio() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const profileData = await apiService.getProfile();
+        if (profileData.success && profileData.data) {
+          setProfile(profileData.data);
+        }
+
         const categoriesData = await apiService.getCategories();
         if (categoriesData.success) {
           const mappedCategories = categoriesData.data.map(cat => ({
@@ -230,12 +236,13 @@ export default function VideoEditorPortfolio() {
                   <div className="rounded-full bg-blue-500 mt-2"></div>
                   <div className="w-60 h-61 overflow-hidden pb-2 mt-2 relative">
                     <Image
-                      src="/images/profile-photo-1.png"
-                      alt="Ho Duc Doan"
+                      src={profile?.avatar_url || "/images/profile-photo-1.png"}
+                      alt={profile?.name || "Ho Duc Doan"}
                       width={240}
                       height={240}
                       className="w-full h-full object-cover"
                       style={{ width: '100%', height: '100%' }}
+                      unoptimized={!!profile?.avatar_url}
                     />
                   </div>
                 </div>
@@ -243,13 +250,13 @@ export default function VideoEditorPortfolio() {
 
               <div className="mt-8 z-10">
                 <div className="bg-white rounded-2xl px-8 py-4 shadow-lg flex gap-6 items-center">
-                  <a href="https://www.facebook.com/ducdoan.24" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" aria-label="Facebook">
+                  <a href={profile?.facebook_url || "https://www.facebook.com/ducdoan.24"} className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors" aria-label="Facebook">
                     <Facebook className="w-6 h-6 text-white" />
                   </a>
-                  <a href="https://www.instagram.com/ducdoan.04/" className="w-12 h-12 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" aria-label="Instagram">
+                  <a href={profile?.instagram_url || "https://www.instagram.com/ducdoan.04/"} className="w-12 h-12 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full flex items-center justify-center hover:opacity-90 transition-opacity" aria-label="Instagram">
                     <Instagram className="w-6 h-6 text-white" />
                   </a>
-                  <a href="https://zalo.me/0919261712" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:scale-105 transition-colors" aria-label="Zalo">
+                  <a href={profile?.zalo_url || "https://zalo.me/0919261712"} className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:scale-105 transition-colors" aria-label="Zalo">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0,256,256" className="w-full h-full" fillRule="nonzero"><g fill="none" fillRule="nonzero" stroke="none" strokeWidth="none" strokeLinecap="butt" strokeLinejoin="none" strokeMiterlimit="10" strokeDasharray="" strokeDashoffset="0" fontFamily="none" fontWeight="none" fontSize="none" textAnchor="none" style={{ mixBlendMode: "normal" }}><path transform="scale(5.33333,5.33333)" d="M29,43h-10c-7.732,0 -14,-6.268 -14,-14v-10c0,-5.88471 3.63593,-10.91138 8.78037,-12.98053c0.00188,-0.00182 0.00375,-0.00365 0.00563,-0.00547c1.613,-0.648 3.369,-1.014 5.214,-1.014h10c7.732,0 14,6.268 14,14v10c0,3.014 -0.962,5.799 -2.583,8.084c-0.00623,0.00379 -0.01246,0.00759 -0.0187,0.01137c-2.53574,3.56814 -6.6879,5.90463 -11.3983,5.90463z" fill="#3160ff" stroke="#3160ff" strokeWidth="2" strokeLinejoin="round"></path><g transform="scale(5.33333,5.33333)" stroke="none" strokeWidth="1" strokeLinejoin="miter"><path d="M15,36v-29.173l-1.211,-0.811c-5.149,2.067 -8.789,7.096 -8.789,12.984v10c0,7.732 6.268,14 14,14h10c4.722,0 8.883,-2.348 11.417,-5.931v-1.069z" fill="#2962ff"></path><path d="M29,5h-10c-1.845,0 -3.601,0.366 -5.214,1.014c-3.333,3.236 -5.786,8.514 -5.786,12.986c0,6.771 0.936,10.735 3.712,14.607c0.216,0.301 0.357,0.653 0.376,1.022c0.043,0.835 -0.129,2.365 -1.634,3.742c-0.162,0.148 -0.059,0.419 0.16,0.428c0.942,0.041 2.843,-0.014 4.797,-0.877c0.557,-0.246 1.191,-0.203 1.729,0.083c3.313,1.759 7.193,1.995 10.86,1.995c4.676,0 9.339,-1.04 12.417,-2.916c1.621,-2.285 2.583,-5.07 2.583,-8.084v-10c0,-7.732 -6.268,-14 -14,-14z" fill="#eeeeee"></path><path d="M36.75,27c-2.067,0 -3.75,-1.683 -3.75,-3.75c0,-2.067 1.683,-3.75 3.75,-3.75c2.067,0 3.75,1.683 3.75,3.75c0,2.067 -1.683,3.75 -3.75,3.75zM36.75,21c-1.24,0 -2.25,1.01 -2.25,2.25c0,1.24 1.01,2.25 2.25,2.25c1.24,0 2.25,-1.01 2.25,-2.25c0,-1.24 -1.01,-2.25 -2.25,-2.25z" fill="#2962ff"></path><path d="M31.5,27h-1c-0.276,0 -0.5,-0.224 -0.5,-0.5v-8.5h1.5z" fill="#2962ff"></path><path d="M27,19.75v0.519c-0.629,-0.476 -1.403,-0.769 -2.25,-0.769c-2.067,0 -3.75,1.683 -3.75,3.75c0,2.067 1.683,3.75 3.75,3.75c0.847,0 1.621,-0.293 2.25,-0.769v0.269c0,0.276 0.224,0.5 0.5,0.5h1v-7.25zM24.75,25.5c-1.24,0 -2.25,-1.01 -2.25,-2.25c0,-1.24 1.01,-2.25 2.25,-2.25c1.24,0 2.25,1.01 2.25,2.25c0,1.24 -1.01,2.25 -2.25,2.25z" fill="#2962ff"></path><path d="M21.25,18h-8v1.5h5.321l-5.571,6.5h0.026c-0.163,0.211 -0.276,0.463 -0.276,0.75v0.25h7.5c0.276,0 0.5,-0.224 0.5,-0.5v-1h-5.321l5.571,-6.5h-0.026c0.163,-0.211 0.276,-0.463 0.276,-0.75z" fill="#2962ff"></path></g></g></svg>
                   </a>
                 </div>
@@ -258,10 +265,10 @@ export default function VideoEditorPortfolio() {
 
             {/* Right Side - Content */}
             <div className="flex-1 w-full md:w-auto pt-0 md:pt-4 relative">
-              <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-1 md:mt-0">HO DUC DOAN</h1>
-              <p className="text-gray-500 font-medium text-lg mb-2">Hi there!</p>
-              <p className="text-gray-600 leading-relaxed mb-6 max-w-lg">
-                I'm Doan a passionate video editor with 3 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life.
+              <h1 className="text-4xl md:text-5xl font-bold text-black mb-2 mt-1 md:mt-0">{profile?.name || "HO DUC DOAN"}</h1>
+              <p className="text-gray-500 font-medium text-lg mb-2">{profile?.greeting || "Hi there!"}</p>
+              <p className="text-gray-600 leading-relaxed mb-6 max-w-lg whitespace-pre-line">
+                {profile?.description || "I'm Doan a passionate video editor with 3 years of experience in various styles, from corporate to cinematic and social media content. Check out my work to see how I bring stories to life."}
               </p>
 
               <div className="space-y-3 mb-4 md:mb-8">
@@ -269,14 +276,14 @@ export default function VideoEditorPortfolio() {
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <span className="font-semibold text-gray-800">Video Editing Tools:</span>
-                    <span className="text-gray-600 ml-1">Capcut Pc, Premiere Pro, After Effects</span>
+                    <span className="text-gray-600 ml-1">{profile?.video_tools || "Capcut Pc, Premiere Pro, After Effects"}</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
                   <div>
                     <span className="font-semibold text-gray-800">Photo Editing Tools:</span>
-                    <span className="text-gray-600 ml-1">Photoshop, Illustrator, Evoto</span>
+                    <span className="text-gray-600 ml-1">{profile?.photo_tools || "Photoshop, Illustrator, Evoto"}</span>
                   </div>
                 </div>
               </div>
@@ -298,7 +305,7 @@ export default function VideoEditorPortfolio() {
                 <Rocket className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div className="text-center md:text-left">
-                <div className="text-xl md:text-2xl font-bold text-black">3 years</div>
+                <div className="text-xl md:text-2xl font-bold text-black">{profile?.experience_years ?? 3} years</div>
                 <div className="text-gray-600 text-xs md:text-sm">Work Experience</div>
               </div>
             </div>
@@ -307,7 +314,7 @@ export default function VideoEditorPortfolio() {
                 <CheckCircle className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div className="text-center md:text-left">
-                <div className="text-xl md:text-2xl font-bold text-black">99%</div>
+                <div className="text-xl md:text-2xl font-bold text-black">{profile?.satisfaction_rate ?? 99}%</div>
                 <div className="text-gray-600 text-xs md:text-sm">Customer Satisfaction</div>
               </div>
             </div>
@@ -316,7 +323,7 @@ export default function VideoEditorPortfolio() {
                 <Building className="w-7 h-7 md:w-8 md:h-8 text-white" />
               </div>
               <div className="text-center md:text-left">
-                <div className="text-xl md:text-2xl font-bold text-black">600+</div>
+                <div className="text-xl md:text-2xl font-bold text-black">{profile?.toeic_score ?? 600}+</div>
                 <div className="text-gray-600 text-xs md:text-sm">TOEIC</div>
               </div>
             </div>

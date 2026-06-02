@@ -24,9 +24,9 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
 
   const handleAddCategory = async (e) => {
     e.preventDefault()
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/categories`, {
         method: 'POST',
         headers: {
@@ -53,9 +53,9 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
 
   const handleEditCategory = async (e) => {
     e.preventDefault()
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/categories/${selectedCategory.id}`, {
         method: 'PUT',
         headers: {
@@ -85,7 +85,7 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
     if (!confirm('Are you sure you want to delete this category?')) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/categories/${categoryId}`, {
         method: 'DELETE'
       })
@@ -137,8 +137,8 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div 
-                    className="w-4 h-4 rounded-full" 
+                  <div
+                    className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: category.color || '#3B82F6' }}
                   />
                   <div>
@@ -148,7 +148,7 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
                 </div>
                 <Badge variant="secondary">{category.id}</Badge>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"

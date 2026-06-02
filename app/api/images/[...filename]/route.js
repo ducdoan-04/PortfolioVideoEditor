@@ -3,17 +3,17 @@ import { NextResponse } from 'next/server';
 export async function GET(request, { params }) {
   try {
     const filename = params.filename.join('/');
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
     const imageUrl = `${backendUrl}/uploads/${filename}`;
-    
+
     const response = await fetch(imageUrl);
-    
+
     if (!response.ok) {
       return new NextResponse('Image not found', { status: 404 });
     }
-    
+
     const imageBuffer = await response.arrayBuffer();
-    
+
     return new NextResponse(imageBuffer, {
       headers: {
         'Content-Type': response.headers.get('Content-Type') || 'image/png',

@@ -11,14 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { Toaster } from "@/components/ui/sonner"
-import { 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  LogOut, 
-  Upload, 
-  Video, 
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  LogOut,
+  Upload,
+  Video,
   Image as ImageIcon,
   Users,
   Tag
@@ -28,6 +28,8 @@ import VideoThumbnail from "@/components/VideoThumbnail"
 import AdminLogin from "./login/page.jsx"
 import CategoryManagement from "@/components/CategoryManagement"
 import UserManagement from "@/components/UserManagement"
+import ProfileManagement from "@/components/ProfileManagement"
+import { UserCircle } from "lucide-react"
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -76,7 +78,7 @@ export default function AdminPage() {
       }
 
       // Verify token with backend
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/admin/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -101,7 +103,7 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const [videosRes, categoriesRes, usersRes] = await Promise.all([
         fetch(`${apiUrl}/api/videos?all=true`),
         fetch(`${apiUrl}/api/categories`),
@@ -138,9 +140,9 @@ export default function AdminPage() {
 
   const handleDeleteAllVideos = async () => {
     toast.loading('Đang xóa tất cả videos...')
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/videos`, {
         method: 'DELETE'
       })
@@ -165,17 +167,17 @@ export default function AdminPage() {
   const handleAddVideo = async (e) => {
     e.preventDefault()
     toast.loading('Đang thêm video...')
-    
+
     try {
       const formDataToSend = new FormData()
-      
+
       Object.keys(formData).forEach(key => {
         if (formData[key] !== null && formData[key] !== '') {
           formDataToSend.append(key, formData[key])
         }
       })
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/videos`, {
         method: 'POST',
         body: formDataToSend
@@ -210,10 +212,10 @@ export default function AdminPage() {
   const handleEditVideo = async (e) => {
     e.preventDefault()
     toast.loading('Đang cập nhật video...')
-    
+
     try {
       const formDataToSend = new FormData()
-      
+
       // Gửi tất cả các field text
       Object.keys(formData).forEach(key => {
         if (key !== 'thumbnail' && formData[key] !== null && formData[key] !== '') {
@@ -226,7 +228,7 @@ export default function AdminPage() {
         formDataToSend.append('thumbnail', formData.thumbnail)
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/videos/${selectedVideo.id}`, {
         method: 'PUT',
         body: formDataToSend
@@ -263,9 +265,9 @@ export default function AdminPage() {
     if (!confirm('Bạn có chắc muốn xóa video này?')) return
 
     toast.loading('Đang xóa video...')
-    
+
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
         method: 'DELETE'
       })
@@ -309,34 +311,34 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-        <div className="min-h-screen bg-gray-200 flex items-center justify-center">
-          <div className="relative">
+      <div className="min-h-screen bg-gray-200 flex items-center justify-center">
+        <div className="relative">
 
-            {/* Chat bubble */}
-            <div className="absolute -top-6 left-1/3 translate-x-8">
-              <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
-                <p className="text-gray-700 text-base font-medium whitespace-nowrap">
-                  Please wait a moment<span className="animate-pulse">...</span>
-                </p>  
+          {/* Chat bubble */}
+          <div className="absolute -top-6 left-1/3 translate-x-8">
+            <div className="relative bg-white px-6 py-3 rounded-2xl shadow-md">
+              <p className="text-gray-700 text-base font-medium whitespace-nowrap">
+                Please wait a moment<span className="animate-pulse">...</span>
+              </p>
 
-                {/* Tail */}
-                <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45"></div>
-              </div>
+              {/* Tail */}
+              <div className="absolute -bottom-2 left-6 w-4 h-4 bg-white rotate-45"></div>
             </div>
-
-            {/* Avatar */}
-            <div className="w-50 h-52 rounded-full bg-blue-500  flex items-center justify-center overflow-hidden">
-              <Image
-                src="/images/loding-gif.gif"
-                alt="Loading"
-                width={400}
-                height={400}
-                className="w-full h-full object-contain"
-              />
-            </div>
-
           </div>
+
+          {/* Avatar */}
+          <div className="w-50 h-52 rounded-full bg-blue-500  flex items-center justify-center overflow-hidden">
+            <Image
+              src="/images/loding-gif.gif"
+              alt="Loading"
+              width={400}
+              height={400}
+              className="w-full h-full object-contain"
+            />
+          </div>
+
         </div>
+      </div>
     );
   }
 
@@ -463,6 +465,14 @@ export default function AdminPage() {
             <Users className="w-4 h-4" />
             <span>Users</span>
           </Button>
+          <Button
+            variant={activeTab === "profile" ? "default" : "ghost"}
+            onClick={() => setActiveTab("profile")}
+            className="flex items-center space-x-2"
+          >
+            <UserCircle className="w-4 h-4" />
+            <span>Profile</span>
+          </Button>
         </div>
 
         {/* Tab Content */}
@@ -559,6 +569,10 @@ export default function AdminPage() {
 
         {activeTab === "users" && (
           <UserManagement users={users} onUsersChange={fetchData} />
+        )}
+
+        {activeTab === "profile" && (
+          <ProfileManagement />
         )}
       </div>
 
@@ -716,7 +730,7 @@ export default function AdminPage() {
             </div>
             <div>
               <Label htmlFor="edit-thumbnail">Thumbnail Image</Label>
-              
+
               {/* Hiển thị ảnh hiện tại */}
               {selectedVideo && (
                 <div className="mb-3">
@@ -724,9 +738,9 @@ export default function AdminPage() {
                   <div className="relative w-32 h-20 bg-gray-100 rounded-lg overflow-hidden">
                     {selectedVideo.thumbnail_url ? (
                       <img
-                        src={selectedVideo.thumbnail_url.startsWith('http') 
-                          ? selectedVideo.thumbnail_url 
-                          : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${selectedVideo.thumbnail_url}`
+                        src={selectedVideo.thumbnail_url.startsWith('http')
+                          ? selectedVideo.thumbnail_url
+                          : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}${selectedVideo.thumbnail_url}`
                         }
                         alt="Current thumbnail"
                         className="w-full h-full object-cover"
@@ -744,7 +758,7 @@ export default function AdminPage() {
 
                 </div>
               )}
-              
+
               <Input
                 id="edit-thumbnail"
                 type="file"
@@ -752,7 +766,7 @@ export default function AdminPage() {
                 onChange={handleFileChange}
                 className="cursor-pointer"
               />
-              
+
               {/* Hiển thị file mới được chọn */}
               {formData.thumbnail && formData.thumbnail instanceof File && (
                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
@@ -761,10 +775,10 @@ export default function AdminPage() {
                   </p>
                 </div>
               )}
-              
+
               <p className="text-sm text-gray-500 mt-1">
-                {selectedVideo && selectedVideo.thumbnail_url 
-                  ? "Upload a new thumbnail image (leave empty to keep current)" 
+                {selectedVideo && selectedVideo.thumbnail_url
+                  ? "Upload a new thumbnail image (leave empty to keep current)"
                   : "Upload a thumbnail image"}
               </p>
             </div>

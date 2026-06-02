@@ -24,7 +24,7 @@ export default function AdminLogin() {
     setIsLoading(true)
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
         headers: {
@@ -64,7 +64,7 @@ export default function AdminLogin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
       <Toaster />
-      
+
       <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
         <CardHeader className="text-center pb-8">
           <div className="flex justify-center mb-6">
@@ -75,7 +75,7 @@ export default function AdminLogin() {
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">Admin Login</CardTitle>
           <p className="text-gray-600">Access your portfolio management panel</p>
         </CardHeader>
-        
+
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -94,7 +94,7 @@ export default function AdminLogin() {
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
               <div className="relative">
@@ -124,7 +124,7 @@ export default function AdminLogin() {
                 </Button>
               </div>
             </div>
-            
+
             <Button
               type="submit"
               className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
@@ -140,12 +140,12 @@ export default function AdminLogin() {
               )}
             </Button>
           </form>
-          
+
           <div className="text-center space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              
+
             </div>
-            
+
             <Button
               variant="ghost"
               onClick={() => router.push('/')}

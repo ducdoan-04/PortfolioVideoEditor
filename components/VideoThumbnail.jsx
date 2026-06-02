@@ -8,24 +8,24 @@ export default function VideoThumbnail({ video, className = "w-full h-full objec
   // Nếu là đường dẫn cũ từ /uploads, thử nhiều URL
   const getThumbnailUrl = (thumbnailUrl) => {
     if (!thumbnailUrl) return null;
-    
+
     // Nếu là URL Cloudinary (bắt đầu với https://res.cloudinary.com), dùng trực tiếp
     if (thumbnailUrl.startsWith('https://res.cloudinary.com')) {
       return thumbnailUrl;
     }
-    
+
     // Nếu là URL đầy đủ (http/https), dùng trực tiếp
     if (thumbnailUrl.startsWith('http')) {
       return thumbnailUrl;
     }
-    
+
     // Nếu là đường dẫn tương đối cũ, thử qua backend
     const filename = thumbnailUrl.split('/').pop();
-    return `http://localhost:3001${thumbnailUrl}`;
+    return `http://localhost:3000${thumbnailUrl}`;
   };
 
   const thumbnailUrl = getThumbnailUrl(video.thumbnail_url);
-  
+
   if (!thumbnailUrl || imageError) {
     return (
       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
@@ -42,7 +42,7 @@ export default function VideoThumbnail({ video, className = "w-full h-full objec
   };
 
   return (
-    <img 
+    <img
       src={thumbnailUrl}
       alt={video.title}
       className={className}
