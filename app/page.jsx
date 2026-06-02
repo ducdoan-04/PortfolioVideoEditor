@@ -250,26 +250,27 @@ export default function VideoEditorPortfolio() {
         </div>
       </div>
 
-      {/* Language Switch */}
-      <div className="fixed top-4 right-4 z-50">
-        <div className="bg-white rounded-full shadow-lg p-1 flex items-center border border-gray-200">
-          <button 
-            onClick={() => setLang('VIE')}
-            className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'VIE' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
-          >
-            VIE
-          </button>
-          <button 
-            onClick={() => setLang('EN')}
-            className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'EN' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
-          >
-            EN
-          </button>
-        </div>
-      </div>
-
       {/* Main Container */}
-      <div className="max-w-6xl mx-auto bg-white mt-0 md:pt-8">
+      <div className="max-w-6xl mx-auto bg-white mt-0 md:pt-8 relative">
+
+        {/* Language Switch */}
+        <div className="absolute top-2 right-4 z-50">
+          <div className="bg-white rounded-full shadow-md p-1 flex items-center border border-gray-200">
+            <button
+              onClick={() => setLang('VIE')}
+              className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'VIE' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
+            >
+              VIE
+            </button>
+            <button
+              onClick={() => setLang('EN')}
+              className={`px-3 py-1 text-sm font-bold rounded-full transition-colors ${lang === 'EN' ? 'bg-blue-500 text-white' : 'text-gray-500 hover:text-gray-800'}`}
+            >
+              EN
+            </button>
+          </div>
+        </div>
+
         {/* Header Section */}
         <div className="relative px-8 pt-12 pb-6 md:pb-8 flex justify-center">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-8 md:gap-16">
@@ -409,8 +410,8 @@ export default function VideoEditorPortfolio() {
                   handleCategoryChange(category.id);
                 }}
                 className={`px-6 py-3 rounded-full font-medium transition-all ${activeCategory === category.id
-                    ? "bg-blue-500 text-white hover:bg-blue-600"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-blue-500 text-white hover:bg-blue-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
               >
                 {category.name}
