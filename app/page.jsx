@@ -20,12 +20,14 @@ const t = {
     showcase: "My Portfolio",
     showcaseDesc: "Have a look on my products, I'm sure you will love it.",
     recent: "Recent Projects",
+    recentDesc: "These are my latest projects, hope you love it.",
     tools: "Tools:",
     desc: "Description:",
     noDesc: "No description available",
-    views: "Views",
-    date: "Date",
-    years: "years"
+    views: "views",
+    date: "Date:",
+    years: "years",
+    love: "You love my products???"
   },
   VIE: {
     wait: "Vui lòng đợi một lát...",
@@ -37,12 +39,14 @@ const t = {
     showcase: "Dự án Nổi bật",
     showcaseDesc: "Hãy xem qua các sản phẩm của tôi, chắc chắn bạn sẽ thích.",
     recent: "Dự án Gần đây",
+    recentDesc: "Đây là các dự án mới nhất của tôi.",
     tools: "Công cụ:",
     desc: "Mô tả:",
     noDesc: "Chưa có mô tả",
-    views: "Lượt xem",
-    date: "Ngày",
-    years: "năm"
+    views: "lượt xem",
+    date: "Ngày:",
+    years: "năm",
+    love: "Bạn thích sản phẩm của tôi???"
   }
 }
 
@@ -508,17 +512,21 @@ export default function VideoEditorPortfolio() {
         </div>
 
         {/* Recent Projects Section */}
-        <div className="px-8 pb-16">
-          <h2 className="text-3xl font-bold text-black mb-8 text-center">{t[lang].recent}</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="bg-gray-50 px-8 py-16">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-black mb-4">{t[lang].recent}</h2>
+            <p className="text-gray-600">{t[lang].recentDesc}</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {recentProjects.map((project, index) => (
               <Card
                 key={index}
-                className="flex flex-col sm:flex-row overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+                className="group cursor-pointer hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
                 onClick={() => openVideoModal(project.video_id, project.title, project.software, project.description)}
               >
-                <CardContent className="p-0 flex flex-col sm:flex-row w-full">
-                  <div className="relative overflow-hidden sm:w-1/3">
+                <CardContent className="p-0">
+                  <div className="relative overflow-hidden rounded-t-lg">
                     <img
                       src={project.thumbnail}
                       alt={project.title}
@@ -538,13 +546,13 @@ export default function VideoEditorPortfolio() {
                       </div>
                     </div>
                     <Badge className="absolute top-3 right-3 bg-red-600 text-white text-xs px-2 py-1">
-                      {project.views || "N/A"} views
+                      {project.views || "N/A"} {t[lang].views}
                     </Badge>
                   </div>
                   <div className="p-6">
                     <h3 className="font-bold text-gray-900 mb-2">{project.title}</h3>
-                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Tools:</a> {project.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
-                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>Date:</a> {project.date || "N/A"}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>{t[lang].tools}</a> {project.software || "Capcut Pc, Premiere Pro, After Effects"}</p>
+                    <p className="text-sm text-gray-600"><a href="" style={{ textDecoration: "none", color: "black" }}>{t[lang].date}</a> {project.date || "N/A"}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -554,9 +562,9 @@ export default function VideoEditorPortfolio() {
 
         {/* Contact Section */}
         <div className="bg-white px-8 py-16 text-center">
-          <h2 className="text-2xl font-bold text-black mb-6">You love my products???</h2>
+          <h2 className="text-2xl font-bold text-black mb-6">{t[lang].love}</h2>
           <a href="mailto:ducdoan04.work@gmail.com" className="text-blue-500 hover:underline">
-            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-full font-medium text-lg mb-8">Contact me now</Button>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white px-10 py-4 rounded-full font-medium text-lg mb-8">{t[lang].contact}</Button>
           </a>
           <div className="space-y-4">
             <div className="flex items-center justify-center gap-3">
