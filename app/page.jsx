@@ -171,6 +171,7 @@ export default function VideoEditorPortfolio() {
               width={400}
               height={400}
               className="w-full h-full object-contain"
+              unoptimized={true}
             />
           </div>
 
