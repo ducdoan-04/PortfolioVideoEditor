@@ -6,7 +6,7 @@ export default function VideoList({ videos }) {
           // Hỗ trợ cả Cloudinary URLs (đầy đủ) và URLs cũ
           let thumbnailUrl = video.thumbnail_url;
           if (thumbnailUrl && !thumbnailUrl.startsWith('http')) {
-            thumbnailUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}${video.thumbnail_url}`;
+            thumbnailUrl = `${video.thumbnail_url}`;
           }
 
           return (

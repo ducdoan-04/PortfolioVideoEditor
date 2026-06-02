@@ -78,8 +78,7 @@ export default function AdminPage() {
       }
 
       // Verify token with backend
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/admin/verify`, {
+            const response = await fetch(`/api/admin/verify`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -103,11 +102,10 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const [videosRes, categoriesRes, usersRes] = await Promise.all([
-        fetch(`${apiUrl}/api/videos?all=true`),
-        fetch(`${apiUrl}/api/categories`),
-        fetch(`${apiUrl}/api/users`)
+            const [videosRes, categoriesRes, usersRes] = await Promise.all([
+        fetch(`/api/videos?all=true`),
+        fetch(`/api/categories`),
+        fetch(`/api/users`)
       ])
 
       const videosData = await videosRes.json()
@@ -142,8 +140,7 @@ export default function AdminPage() {
     toast.loading('Đang xóa tất cả videos...')
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/videos`, {
+            const response = await fetch(`/api/videos`, {
         method: 'DELETE'
       })
 
@@ -177,8 +174,7 @@ export default function AdminPage() {
         }
       })
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/videos`, {
+            const response = await fetch(`/api/videos`, {
         method: 'POST',
         body: formDataToSend
       })
@@ -228,8 +224,7 @@ export default function AdminPage() {
         formDataToSend.append('thumbnail', formData.thumbnail)
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/videos/${selectedVideo.id}`, {
+            const response = await fetch(`/api/videos/${selectedVideo.id}`, {
         method: 'PUT',
         body: formDataToSend
       })
@@ -267,8 +262,7 @@ export default function AdminPage() {
     toast.loading('Đang xóa video...')
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/videos/${videoId}`, {
+            const response = await fetch(`/api/videos/${videoId}`, {
         method: 'DELETE'
       })
 
@@ -740,7 +734,7 @@ export default function AdminPage() {
                       <img
                         src={selectedVideo.thumbnail_url.startsWith('http')
                           ? selectedVideo.thumbnail_url
-                          : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}${selectedVideo.thumbnail_url}`
+                          : `${selectedVideo.thumbnail_url}`
                         }
                         alt="Current thumbnail"
                         className="w-full h-full object-cover"

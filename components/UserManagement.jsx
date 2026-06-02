@@ -29,8 +29,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
     e.preventDefault()
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/users`, {
+            const response = await fetch(`/api/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -58,8 +57,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
     e.preventDefault()
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/users/${selectedUser.id}`, {
+            const response = await fetch(`/api/users/${selectedUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -88,8 +86,7 @@ export default function UserManagement({ users = [], onUsersChange }) {
     if (!confirm('Are you sure you want to delete this user?')) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/users/${userId}`, {
+            const response = await fetch(`/api/users/${userId}`, {
         method: 'DELETE'
       })
 

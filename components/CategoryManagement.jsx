@@ -26,8 +26,7 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
     e.preventDefault()
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/categories`, {
+            const response = await fetch(`/api/categories`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -55,8 +54,7 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
     e.preventDefault()
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/categories/${selectedCategory.id}`, {
+            const response = await fetch(`/api/categories/${selectedCategory.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -85,8 +83,7 @@ export default function CategoryManagement({ categories = [], onCategoriesChange
     if (!confirm('Are you sure you want to delete this category?')) return
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
-      const response = await fetch(`${apiUrl}/api/categories/${categoryId}`, {
+            const response = await fetch(`/api/categories/${categoryId}`, {
         method: 'DELETE'
       })
 
