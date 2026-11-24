@@ -1,16 +1,28 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Toaster } from '@/components/ui/sonner'
-import { Eye, EyeOff, User, Lock, ArrowLeft } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  User,
+  Lock,
+  ArrowLeft,
+  Clapperboard,
+  Sun,
+  Moon,
+  ShieldCheck
+} from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminLogin() {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -19,12 +31,16 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-            const response = await fetch(`/api/admin/login`, {
+      const response = await fetch(`/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +54,6 @@ export default function AdminLogin() {
         localStorage.setItem('admin-token', data.token)
         localStorage.setItem('admin-user', JSON.stringify(data.user))
         toast.success('Đăng nhập thành công!')
-        // Force page reload to ensure admin page recognizes the login
         setTimeout(() => {
           window.location.href = '/admin'
         }, 100)
@@ -61,64 +76,100 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <Toaster />
+    <div className="min-h-screen bg-background text-foreground bg-studio-grid flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Ambient Orbs */}
+      <div className="fixed -top-32 -left-32 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed -bottom-32 -right-32 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
 
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="text-center pb-8">
-          <div className="flex justify-center mb-6">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-4 rounded-full shadow-lg">
-              <User className="h-8 w-8 text-white" />
+      {/* Top Bar Actions */}
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-2">
+        {mounted && (
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+            className="h-10 w-10 rounded-xl bg-card/80 backdrop-blur-md border-border"
+            aria-label="Toggle theme"
+          >
+            {resolvedTheme === 'dark' ? (
+              <Sun className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Moon className="w-4 h-4 text-slate-700" />
+            )}
+          </Button>
+        )}
+      </div>
+
+      <Card className="w-full max-w-md shadow-2xl border border-border/80 bg-card/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-3xl relative z-10 overflow-hidden">
+        <div className="h-1.5 w-full bg-gradient-to-r from-indigo-600 via-blue-500 to-purple-600" />
+        <CardHeader className="text-center pt-8 pb-6 space-y-3">
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 text-white">
+              <Clapperboard className="h-8 w-8" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold text-gray-800 mb-2">Admin Login</CardTitle>
-          <p className="text-gray-600">Access your portfolio management panel</p>
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Studio Control Panel</span>
+            </div>
+            <CardTitle className="text-2xl md:text-3xl font-extrabold tracking-tight">
+              Đăng nhập Quản trị
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Quản lý dự án video, danh mục và hồ sơ cá nhân
+            </p>
+          </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 pb-8 px-6 sm:px-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-700 font-medium">Username</Label>
+              <Label htmlFor="username" className="text-sm font-semibold">
+                Tên đăng nhập
+              </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   id="username"
                   name="username"
                   type="text"
                   value={formData.username}
                   onChange={handleInputChange}
-                  placeholder="Enter username"
-                  className="pl-10 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                  placeholder="Nhập username"
+                  className="pl-10 h-11 rounded-xl bg-background/80 border-border"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-gray-700 font-medium">Password</Label>
+              <Label htmlFor="password" className="text-sm font-semibold">
+                Mật khẩu
+              </Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Enter password"
-                  className="pl-10 pr-12 h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 rounded-lg"
+                  placeholder="Nhập mật khẩu"
+                  className="pl-10 pr-11 h-11 rounded-xl bg-background/80 border-border"
                   required
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 text-muted-foreground hover:text-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
+                    <EyeOff className="h-4 w-4" />
                   ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
+                    <Eye className="h-4 w-4" />
                   )}
                 </Button>
               </div>
@@ -126,36 +177,32 @@ export default function AdminLogin() {
 
             <Button
               type="submit"
-              className="w-full h-12 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all"
               disabled={isLoading}
             >
               {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Signing in...
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Đang xác thực...</span>
                 </div>
               ) : (
-                'Sign In'
+                'Đăng nhập hệ thống'
               )}
             </Button>
           </form>
 
-          <div className="text-center space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-
-            </div>
-
+          <div className="pt-2 border-t border-border/60 text-center">
             <Button
               variant="ghost"
               onClick={() => router.push('/')}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className="text-muted-foreground hover:text-foreground rounded-xl text-sm"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Portfolio
+              Quay lại trang Portfolio
             </Button>
           </div>
         </CardContent>
       </Card>
     </div>
   )
-} 
+}
