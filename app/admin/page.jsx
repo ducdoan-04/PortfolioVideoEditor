@@ -29,7 +29,8 @@ import {
   Clock,
   Sparkles,
   ExternalLink,
-  X
+  X,
+  MessageSquare
 } from "lucide-react"
 import Image from "next/image"
 import VideoThumbnail from "@/components/VideoThumbnail"
@@ -37,6 +38,7 @@ import AdminLogin from "./login/page.jsx"
 import CategoryManagement from "@/components/CategoryManagement"
 import UserManagement from "@/components/UserManagement"
 import ProfileManagement from "@/components/ProfileManagement"
+import MessageManagement from "@/components/MessageManagement"
 
 export default function AdminPage() {
   const { resolvedTheme, setTheme } = useTheme()
@@ -46,6 +48,8 @@ export default function AdminPage() {
   const [videos, setVideos] = useState([])
   const [categories, setCategories] = useState([])
   const [users, setUsers] = useState([])
+  const [messages, setMessages] = useState([])
+  const [messagesTableMissing, setMessagesTableMissing] = useState(false)
   const [showAddVideo, setShowAddVideo] = useState(false)
   const [showEditVideo, setShowEditVideo] = useState(false)
   const [selectedVideo, setSelectedVideo] = useState(null)
@@ -112,15 +116,17 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const [videosRes, categoriesRes, usersRes] = await Promise.all([
+      const [videosRes, categoriesRes, usersRes, messagesRes] = await Promise.all([
         fetch(`/api/videos?all=true`),
         fetch(`/api/categories`),
-        fetch(`/api/users`)
+        fetch(`/api/users`),
+        fetch(`/api/messages`)
       ])
 
       const videosData = await videosRes.json()
       const categoriesData = await categoriesRes.json()
       const usersData = await usersRes.json()
+      const messagesData = await messagesRes.json()
 
       if (videosData.success) {
         setVideos(videosData.data.videos || [])
@@ -130,6 +136,10 @@ export default function AdminPage() {
       }
       if (usersData.success) {
         setUsers(usersData.data || [])
+      }
+      if (messagesData.success) {
+        setMessages(messagesData.data || [])
+        setMessagesTableMissing(!!messagesData.tableMissing)
       }
     } catch (error) {
       console.error('Error fetching data:', error)
@@ -505,6 +515,7 @@ export default function AdminPage() {
           {[
             { id: "videos", label: "Quản lý Video", icon: Video, count: videos.length },
             { id: "categories", label: "Danh mục", icon: Tag, count: categories.length },
+            { id: "messages", label: "Yêu cầu Dự án", icon: MessageSquare, count: messages.length },
             { id: "profile", label: "Hồ sơ Cá nhân", icon: UserCircle },
             { id: "users", label: "Tài khoản", icon: Users, count: users.length }
           ].map((tab) => {
@@ -726,6 +737,14 @@ export default function AdminPage() {
 
         {activeTab === "categories" && (
           <CategoryManagement categories={categories} onCategoriesChange={fetchData} />
+        )}
+
+        {activeTab === "messages" && (
+          <MessageManagement
+            messages={messages}
+            tableMissing={messagesTableMissing}
+            onMessagesChange={fetchData}
+          />
         )}
 
         {activeTab === "users" && (

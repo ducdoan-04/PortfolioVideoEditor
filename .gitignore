@@ -19,6 +19,12 @@ yarn-error.log*
 # env files
 .env*
 
+/scripts/reset-password.js
+*.sql
+debug_db.js
+fix_urls.js
+generate_api.js
+
 # vercel
 .vercel
 

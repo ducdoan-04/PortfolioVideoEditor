@@ -99,9 +99,12 @@ const t = {
     loveSub: "Let's collaborate to transform your raw footage into high-retention visual stories.",
     quickBriefTitle: "Send a Quick Project Brief",
     yourName: "Your Name / Brand",
+    yourContact: "Your Email or Phone / Zalo",
     projectType: "Project Type (e.g., Commercial, Reels, YouTube, Wedding)",
     projectDetails: "Tell me about your timeline, style reference, or goals...",
-    sendBrief: "Send via Email",
+    sendBrief: "Send Project Brief",
+    sendingBrief: "Sending...",
+    briefSentSuccess: "Your project brief has been sent! I'll contact you soon.",
     copied: "Copied to clipboard!",
     watchOnYoutube: "Watch on YouTube",
     closeModal: "Close Player",
@@ -161,9 +164,12 @@ const t = {
     loveSub: "Hãy kết nối ngay để cùng tạo nên những sản phẩm video chất lượng và bứt phá lượt xem.",
     quickBriefTitle: "Gửi yêu cầu dự án nhanh",
     yourName: "Tên của bạn / Thương hiệu",
+    yourContact: "Email hoặc Số điện thoại / Zalo liên hệ",
     projectType: "Thể loại video (VD: Reels/TikTok, YouTube, TVC, Sự kiện...)",
     projectDetails: "Chia sẻ ngắn gọn về ý tưởng, số lượng video hoặc thời gian mong muốn...",
-    sendBrief: "Gửi qua Email",
+    sendBrief: "Gửi yêu cầu dự án",
+    sendingBrief: "Đang gửi...",
+    briefSentSuccess: "Đã gửi yêu cầu dự án thành công! Tôi sẽ liên hệ lại sớm nhất.",
     copied: "Đã sao chép!",
     watchOnYoutube: "Mở trên YouTube",
     closeModal: "Đóng",
@@ -359,8 +365,10 @@ export default function VideoEditorPortfolio() {
   const [visibleCount, setVisibleCount] = useState(6)
   const [copiedField, setCopiedField] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [sendingBrief, setSendingBrief] = useState(false)
   const [briefForm, setBriefForm] = useState({
     name: '',
+    contactInfo: '',
     projectType: '',
     details: ''
   })
@@ -547,16 +555,44 @@ export default function VideoEditorPortfolio() {
     setTimeout(() => setCopiedField(null), 2000)
   }
 
-  const handleSendBrief = (e) => {
+  const handleSendBrief = async (e) => {
     e.preventDefault()
-    const targetEmail = profile?.email || 'ducdoan04.work@gmail.com'
-    const subject = encodeURIComponent(
-      `[Portfolio Inquiry] ${briefForm.projectType || 'Video Editing Project'} - ${briefForm.name || 'Client'}`
-    )
-    const body = encodeURIComponent(
-      `Xin chào Đoan,\n\nTôi là: ${briefForm.name}\nThể loại dự án: ${briefForm.projectType}\n\nChi tiết dự án:\n${briefForm.details}\n`
-    )
-    window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`
+    setSendingBrief(true)
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: briefForm.name,
+          contact_info: briefForm.contactInfo,
+          project_type: briefForm.projectType,
+          details: briefForm.details
+        })
+      })
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success(t[lang].briefSentSuccess)
+        setBriefForm({ name: '', contactInfo: '', projectType: '', details: '' })
+      } else if (result.tableMissing) {
+        // Fallback to mailto if SQL table hasn't been initialized yet
+        const targetEmail = profile?.email || 'ducdoan04.work@gmail.com'
+        const subject = encodeURIComponent(
+          `[Portfolio Inquiry] ${briefForm.projectType || 'Video Editing Project'} - ${briefForm.name || 'Client'}`
+        )
+        const body = encodeURIComponent(
+          `Xin chào Đoan,\n\nTôi là: ${briefForm.name}\nLiên hệ: ${briefForm.contactInfo}\nThể loại dự án: ${briefForm.projectType}\n\nChi tiết dự án:\n${briefForm.details}\n`
+        )
+        window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`
+      } else {
+        toast.error(result.message || 'Gửi yêu cầu thất bại, vui lòng thử lại.')
+      }
+    } catch (error) {
+      console.error('Send brief error:', error)
+      toast.error('Lỗi kết nối server')
+    } finally {
+      setSendingBrief(false)
+    }
   }
 
   const toggleTheme = () => {
@@ -1670,11 +1706,20 @@ export default function VideoEditorPortfolio() {
                   </h3>
 
                   <div className="space-y-3">
-                    <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Input
                         placeholder={t[lang].yourName}
                         value={briefForm.name}
                         onChange={(e) => setBriefForm({ ...briefForm, name: e.target.value })}
+                        required
+                        className="h-11 rounded-xl bg-card"
+                      />
+                      <Input
+                        placeholder={t[lang].yourContact}
+                        value={briefForm.contactInfo}
+                        onChange={(e) =>
+                          setBriefForm({ ...briefForm, contactInfo: e.target.value })
+                        }
                         required
                         className="h-11 rounded-xl bg-card"
                       />
@@ -1704,10 +1749,11 @@ export default function VideoEditorPortfolio() {
 
                   <Button
                     type="submit"
+                    disabled={sendingBrief}
                     className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2"
                   >
                     <Send className="w-4 h-4" />
-                    <span>{t[lang].sendBrief}</span>
+                    <span>{sendingBrief ? t[lang].sendingBrief : t[lang].sendBrief}</span>
                   </Button>
                 </form>
               </div>
