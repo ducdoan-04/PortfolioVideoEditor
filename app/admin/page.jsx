@@ -344,13 +344,13 @@ export default function AdminPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="flex flex-col items-center gap-4">
           <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-indigo-600 to-blue-500 p-1 shadow-xl">
-            <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full rounded-full bg-[#fbfbf9] flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/loding-gif.gif"
                 alt="Loading"
                 width={280}
                 height={280}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover scale-105"
                 unoptimized
               />
             </div>

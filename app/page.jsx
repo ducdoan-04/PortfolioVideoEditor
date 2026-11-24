@@ -49,7 +49,7 @@ import apiService from '@/lib/api'
 
 const t = {
   EN: {
-    wait: "Loading studio workspace...",
+    wait: "Please wait a moment...",
     myName: "HO DUC DOAN",
     roleBadge: "Creative Video Editor & Visual Storyteller",
     available: "Available for Freelance & Studio Projects",
@@ -114,7 +114,7 @@ const t = {
     showLess: "Show Less"
   },
   VIE: {
-    wait: "Đang tải không gian sáng tạo...",
+    wait: "Please wait a moment...",
     myName: "HỒ ĐỨC ĐOAN",
     roleBadge: "Video Editor & Visual Storyteller",
     available: "Sẵn sàng nhận dự án Freelance & Hợp tác",
@@ -614,7 +614,8 @@ export default function VideoEditorPortfolio() {
         <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative flex flex-col items-center">
-          <div className="mb-6 bg-card/90 backdrop-blur-md border border-border px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3">
+          {/* Speech Bubble */}
+          <div className="relative mb-5 bg-card/95 backdrop-blur-md border border-border px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3">
             <span className="flex h-2.5 w-2.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-indigo-500"></span>
@@ -622,16 +623,18 @@ export default function VideoEditorPortfolio() {
             <p className="text-foreground text-sm md:text-base font-medium">
               {t[lang].wait}
             </p>
+            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-card border-r border-b border-border rotate-45" />
           </div>
 
+          {/* Seamless Circular Avatar GIF */}
           <div className="w-44 h-44 rounded-full bg-gradient-to-tr from-indigo-600 via-blue-500 to-cyan-400 p-1 shadow-2xl shadow-indigo-500/25">
-            <div className="w-full h-full rounded-full bg-card flex items-center justify-center overflow-hidden">
+            <div className="w-full h-full rounded-full bg-[#fbfbf9] flex items-center justify-center overflow-hidden">
               <Image
                 src="/images/loding-gif.gif"
                 alt="Loading"
                 width={320}
                 height={320}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover scale-105"
                 unoptimized={true}
               />
             </div>
